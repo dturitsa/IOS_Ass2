@@ -15,6 +15,12 @@
 		1B400BEE1E6D1A1E00DAA5AA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1B400BEC1E6D1A1E00DAA5AA /* Main.storyboard */; };
 		1B400BF01E6D1A1E00DAA5AA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1B400BEF1E6D1A1E00DAA5AA /* Assets.xcassets */; };
 		1B400BF31E6D1A1E00DAA5AA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1B400BF11E6D1A1E00DAA5AA /* LaunchScreen.storyboard */; };
+		1B400BFB1E6D1BE000DAA5AA /* GameObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B400BFA1E6D1BE000DAA5AA /* GameObject.m */; };
+		1B400BFE1E6D1DAF00DAA5AA /* ModelData.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B400BFD1E6D1DAF00DAA5AA /* ModelData.m */; };
+		1B400C281E6D592E00DAA5AA /* Downloads in Resources */ = {isa = PBXBuildFile; fileRef = 1B400C271E6D592E00DAA5AA /* Downloads */; };
+		1B400C2A1E6D594200DAA5AA /* cubeTexture.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B400C291E6D594200DAA5AA /* cubeTexture.png */; };
+		1B400C2C1E6D768700DAA5AA /* crate.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 1B400C2B1E6D768600DAA5AA /* crate.jpg */; };
+		1B400C2E1E6D864100DAA5AA /* sphereTexture2.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B400C2D1E6D864100DAA5AA /* sphereTexture2.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +36,14 @@
 		1B400BEF1E6D1A1E00DAA5AA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1B400BF21E6D1A1E00DAA5AA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1B400BF41E6D1A1E00DAA5AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1B400BFA1E6D1BE000DAA5AA /* GameObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameObject.m; sourceTree = "<group>"; };
+		1B400BFC1E6D1C0300DAA5AA /* GameObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameObject.h; sourceTree = "<group>"; };
+		1B400BFD1E6D1DAF00DAA5AA /* ModelData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModelData.m; sourceTree = "<group>"; };
+		1B400BFF1E6D1DC600DAA5AA /* ModelData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ModelData.h; sourceTree = "<group>"; };
+		1B400C271E6D592E00DAA5AA /* Downloads */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Downloads; sourceTree = "<group>"; };
+		1B400C291E6D594200DAA5AA /* cubeTexture.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cubeTexture.png; sourceTree = "<group>"; };
+		1B400C2B1E6D768600DAA5AA /* crate.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = crate.jpg; sourceTree = "<group>"; };
+		1B400C2D1E6D864100DAA5AA /* sphereTexture2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sphereTexture2.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,10 +76,14 @@
 		1B400BDE1E6D1A1E00DAA5AA /* IOS_Ass2 */ = {
 			isa = PBXGroup;
 			children = (
+				1B400C271E6D592E00DAA5AA /* Downloads */,
 				1B400BE21E6D1A1E00DAA5AA /* AppDelegate.h */,
 				1B400BE31E6D1A1E00DAA5AA /* AppDelegate.m */,
 				1B400BE51E6D1A1E00DAA5AA /* Shader.fsh */,
 				1B400BE71E6D1A1E00DAA5AA /* Shader.vsh */,
+				1B400C2B1E6D768600DAA5AA /* crate.jpg */,
+				1B400C2D1E6D864100DAA5AA /* sphereTexture2.png */,
+				1B400C291E6D594200DAA5AA /* cubeTexture.png */,
 				1B400BE91E6D1A1E00DAA5AA /* GameViewController.h */,
 				1B400BEA1E6D1A1E00DAA5AA /* GameViewController.m */,
 				1B400BEC1E6D1A1E00DAA5AA /* Main.storyboard */,
@@ -73,6 +91,10 @@
 				1B400BF11E6D1A1E00DAA5AA /* LaunchScreen.storyboard */,
 				1B400BF41E6D1A1E00DAA5AA /* Info.plist */,
 				1B400BDF1E6D1A1E00DAA5AA /* Supporting Files */,
+				1B400BFA1E6D1BE000DAA5AA /* GameObject.m */,
+				1B400BFC1E6D1C0300DAA5AA /* GameObject.h */,
+				1B400BFD1E6D1DAF00DAA5AA /* ModelData.m */,
+				1B400BFF1E6D1DC600DAA5AA /* ModelData.h */,
 			);
 			path = IOS_Ass2;
 			sourceTree = "<group>";
@@ -146,9 +168,13 @@
 			files = (
 				1B400BEE1E6D1A1E00DAA5AA /* Main.storyboard in Resources */,
 				1B400BE81E6D1A1E00DAA5AA /* Shader.vsh in Resources */,
+				1B400C2A1E6D594200DAA5AA /* cubeTexture.png in Resources */,
+				1B400C281E6D592E00DAA5AA /* Downloads in Resources */,
 				1B400BF01E6D1A1E00DAA5AA /* Assets.xcassets in Resources */,
 				1B400BF31E6D1A1E00DAA5AA /* LaunchScreen.storyboard in Resources */,
 				1B400BE61E6D1A1E00DAA5AA /* Shader.fsh in Resources */,
+				1B400C2E1E6D864100DAA5AA /* sphereTexture2.png in Resources */,
+				1B400C2C1E6D768700DAA5AA /* crate.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -159,9 +185,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1B400BFB1E6D1BE000DAA5AA /* GameObject.m in Sources */,
 				1B400BE41E6D1A1E00DAA5AA /* AppDelegate.m in Sources */,
 				1B400BEB1E6D1A1E00DAA5AA /* GameViewController.m in Sources */,
 				1B400BE11E6D1A1E00DAA5AA /* main.m in Sources */,
+				1B400BFE1E6D1DAF00DAA5AA /* ModelData.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
