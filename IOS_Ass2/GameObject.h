@@ -18,6 +18,7 @@ typedef struct
     GLuint vArray; //pointer to vertex array
     GLuint vBuffer; //pointer to vertex buffer
     int   length; //# of vertices
+    GLuint textureHandle;//the texture of the object
     
 } VertexInfo;
 
@@ -25,9 +26,13 @@ typedef struct
 @property GLKVector3 rotation;
 @property GLKVector3 modelRotation;
 @property GLKVector3 scale;
-@property GLuint textureHandle;
 
+@property NSString* modelName;
 @property VertexInfo modelHandle;
+
+@property NSString* textureName;
+
+
 
 
 @end

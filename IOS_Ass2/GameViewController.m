@@ -38,7 +38,6 @@ GLint uniforms[NUM_UNIFORMS];
 
 @interface GameViewController () {
     GLuint _program;
-    GLuint _bgTexture;
     GLKMatrix4 _modelViewProjectionMatrix;
     GLKMatrix4 _modelViewMatrix;
     GLKMatrix3 _normalMatrix;
@@ -146,26 +145,50 @@ GLint uniforms[NUM_UNIFORMS];
     
     //create and init player
     //  NSLog(@"initializing player");
+    /*
     _player = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:_player];
     _player.position = GLKVector3Make(0.9f, 0.0f, 0.0f);
     _player.scale = GLKVector3Make(1,1,1);
-
-    
-    //testing for dynamic enemy spawning;
+    _player.modelName = @"player";
+    _player.textureName = @"cubeTexture.png";
+    */
+    //testing for dynamic model spawning;
     GameObject *rotatingCube = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:rotatingCube];
-    rotatingCube.position = GLKVector3Make(2.0f, 2.0f, 0.0f);
+    rotatingCube.position = GLKVector3Make(0.0f, 0.0f, 0.0f);
     rotatingCube.scale = GLKVector3Make(1,1,1);
+    rotatingCube.modelName = @"crate";
+    rotatingCube.textureName = @"crate.jpg";
     
-   /*
-    //load map from file
-    NSLog(@"loading map from file");
-    _mapModel = [MapLoadHelper loadObjectsFromMap:@"map01"];
-    [_gameObjectsToAdd addObjectsFromArray:_mapModel.objects];  //map number hardcoded for now
-*/
-  //  _gameObjectsInView = [[NSMutableArray alloc]init];
- //   [self refreshGameObjectsInView];
+    //setup maze walls
+    GameObject *wall = [[GameObject alloc] init];
+    [_gameObjectsToAdd addObject:wall];
+    wall.position = GLKVector3Make(-2.0f, -2.0f, 0.0f);
+    wall.scale = GLKVector3Make(1,1,4);
+    wall.modelName = @"wall";
+    wall.textureName = @"cubeTexture.png";
+    
+    GameObject *wall1 = [[GameObject alloc] init];
+    [_gameObjectsToAdd addObject:wall1];
+    wall1.position = GLKVector3Make(2.0f, -2.0f, 0.0f);
+    wall1.scale = GLKVector3Make(1,1,4);
+    wall1.modelName = @"wall";
+    wall1.textureName = @"cubeTexture.png";
+    
+    GameObject *wall2 = [[GameObject alloc] init];
+    [_gameObjectsToAdd addObject:wall2];
+    wall2.position = GLKVector3Make(-4.5f, -2.0f, 2.0f);
+    wall2.scale = GLKVector3Make(4,1,1);
+    wall2.modelName = @"wall";
+    wall2.textureName = @"cubeTexture.png";
+    
+    GameObject *wall3 = [[GameObject alloc] init];
+    [_gameObjectsToAdd addObject:wall3];
+    wall3.position = GLKVector3Make(4.5f, -2.0f, 2.0f);
+    wall3.scale = GLKVector3Make(4,1,1);
+    wall3.modelName = @"wall";
+    wall3.textureName = @"crate.jpg";
 
 
 }
@@ -201,14 +224,6 @@ GLint uniforms[NUM_UNIFORMS];
     self.effect.light0.diffuseColor = GLKVector4Make(1.0f, 0.4f, 0.4f, 1.0f);
     
     glEnable(GL_DEPTH_TEST);
-    
-   
-    
-    //playerVert.length = sizeof(p2_pos) / 12;
-    //[self setupVertices:(VertexInfo*)&playerVert :p2_pos :p2_norm :p2_norm];
-    
-    rotatingCubeVert.length = sizeof(cube_pos) / 12;
-    [self setupVertices:(VertexInfo*)&rotatingCubeVert :cube_pos :cube_tex :cube_norm];
 
 }
 
@@ -267,19 +282,37 @@ GLint uniforms[NUM_UNIFORMS];
 
 
 //Associate gameobjects with models
+//this should only run once for each object
 -(void)bindObject:(GameObject*)object
 {
     
     //for debugging
-    NSLog(@"Binding GL for: %@", NSStringFromClass([object class]));
+    NSLog(@"Binding GL for: %@", object.modelName);
     
     //determine model based on what the object is
-    if([object isKindOfClass:[GameObject class]])
+    //if([object isKindOfClass:[GameObject class]])
+    int vertexNum;
+    if ([object.modelName isEqualToString:@"crate"])
     {
-        //object.modelHandle = playerVert;
-        object.modelHandle = rotatingCubeVert;
-        
+        vertexNum = sizeof(crate_v) / 12;
+        object.modelHandle = [self setupVertices :crate_v :crate_vt :crate_vn :vertexNum :object.textureName];
     }
+    else if ([object.modelName isEqualToString:@"player"])
+    {
+        vertexNum = sizeof(cube_pos) / 12;
+        object.modelHandle = [self setupVertices :cube_pos :cube_tex :cube_norm :vertexNum :object.textureName];
+    }
+    else if ([object.modelName isEqualToString:@"wall"])
+    {
+        vertexNum = sizeof(cube_pos) / 12;
+        object.modelHandle = [self setupVertices :cube_pos :cube_tex :cube_norm :vertexNum :object.textureName];
+    }
+    
+    
+    
+    
+    
+    
     
 }
 
@@ -310,6 +343,7 @@ GLint uniforms[NUM_UNIFORMS];
     }
 }
 
+float movement = 0;
 -(void)renderObject:(GameObject*)gameObject
 {
     
@@ -321,14 +355,24 @@ GLint uniforms[NUM_UNIFORMS];
     
     self.effect.transform.projectionMatrix = projectionMatrix;
     
-    GLKMatrix4 baseModelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, -10.0f);
+    GLKMatrix4 baseModelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, 0.0f);
+    //turn to face
+    baseModelViewMatrix = GLKMatrix4Rotate(baseModelViewMatrix, .1f, 0.0f, 1.0f, 0.0f);
+    //move
+    GLKMatrix4 baseModelViewMatrix2 = GLKMatrix4MakeTranslation(0.0f, 0.0f, -10.0f);
+    baseModelViewMatrix = GLKMatrix4Multiply(baseModelViewMatrix, baseModelViewMatrix2);
     
     // Compute the model view matrix for the object rendered with ES2
     //GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, 1.5f);
     GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(gameObject.position.x, gameObject.position.y, 1.5f);
     
-     modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
-     _rotation += self.timeSinceLastUpdate * 0.2f;
+    //rotate the crate
+    if ([gameObject.modelName isEqualToString:@"crate"]){
+        modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
+        _rotation += self.timeSinceLastUpdate * 0.3f;
+    }
+
+    
     
     modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, gameObject.rotation.x+gameObject.modelRotation.x, 1, 0,0);
     modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, gameObject.rotation.y+gameObject.modelRotation.y, 0, 1,0);
@@ -355,34 +399,40 @@ GLint uniforms[NUM_UNIFORMS];
     glUniform4fv(uniforms[UNIFORM_SPECULAR_COMPONENT], 1, specularComponent.v);
     glUniform4fv(uniforms[UNIFORM_AMBIENT_COMPONENT], 1, ambientComponent.v);
     
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, gameObject.modelHandle.textureHandle);
+    glUniform1i(uniforms[UNIFORM_TEXTURE], 0);
+    
     //draw!
-   // glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _modelViewProjectionMatrix.m);
-   // glUniformMatrix3fv(uniforms[UNIFORM_NORMAL_MATRIX], 1, 0, _normalMatrix.m);
-
-    // NSLog(@"moduleHandel array Size: %u", s);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gameObject.modelHandle.vBuffer);
     glDrawArrays(GL_TRIANGLES, 0, gameObject.modelHandle.length);
     glBindVertexArrayOES(0);
  
 }
+
+
 /*
  sets up the vertex array and texture info
-
-params: vertex info struct to hold the model info
-     position array
+params:
+    position array
     texture array
     normals array
+    number of vertices
+    texture name
  */
--(void)setupVertices:(VertexInfo*)vertexInfoStruct :(GLfloat*)posArray :(GLfloat*)texArray :(GLfloat*)normArray
+-(VertexInfo)setupVertices :(GLfloat*)posArray :(GLfloat*)texArray :(GLfloat*)normArray :(int)vertexNum :(NSString*) textureName
 {
+    VertexInfo vertexInfoStruct;
+    vertexInfoStruct.length = vertexNum;
+    //NSLog(@"%u", vertexInfoStruct.length);
     
-    glGenVertexArraysOES(1, &vertexInfoStruct->vArray);
-    glBindVertexArrayOES(vertexInfoStruct->vArray);
+    glGenVertexArraysOES(1, &vertexInfoStruct.vArray);
+    glBindVertexArrayOES(vertexInfoStruct.vArray);
     
-    glGenBuffers(1, &vertexInfoStruct->vBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexInfoStruct->vBuffer);
+    glGenBuffers(1, &vertexInfoStruct.vBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexInfoStruct.vBuffer);
     
-    long size = vertexInfoStruct->length * 8;
+    long size = vertexInfoStruct.length * 8;
     GLfloat mixedArray[size];
     int j = 0;
     int k = 0;
@@ -402,7 +452,6 @@ params: vertex info struct to hold the model info
         //NSLog(@"%.2f", mixedArray[i]);
     }
  //   NSLog(@"%lu", sizeof(sphere_pos));
-  //  NSLog(@"%lu", sizeof(sphere_tex));
     
     //load array into buffer
     glBufferData(GL_ARRAY_BUFFER, sizeof(mixedArray), mixedArray, GL_STATIC_DRAW);
@@ -422,11 +471,10 @@ params: vertex info struct to hold the model info
     
     // Load in and set texture
     /* use setupTexture to create crate texture */
-    _bgTexture = [self setupTexture:@"cubeTexture.png"];
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, _bgTexture);
-    glUniform1i(uniforms[UNIFORM_TEXTURE], 0);
+    vertexInfoStruct.textureHandle = [self setupTexture:textureName];
+
     
+    return vertexInfoStruct;
 }
 
 
