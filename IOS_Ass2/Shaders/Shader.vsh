@@ -46,7 +46,7 @@ uniform mat3 normalMatrix;
 void main()
 {
     // Calculate normal vector in eye coordinates
-    eyeNormal = (normalMatrix * normal);
+    eyeNormal = normalize(normalMatrix * normal);
     
     // Calculate vertex position in view coordinates
     eyePos = modelViewMatrix * position;

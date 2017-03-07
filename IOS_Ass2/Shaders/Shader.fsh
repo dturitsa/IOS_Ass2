@@ -34,8 +34,7 @@ uniform vec4 ambientComponent;
 void main()
 {
     vec4 ambient = ambientComponent;
-    
-    vec3 N = normalize(eyeNormal);
+    vec3 N = normalize(-eyeNormal);
     float nDotVP = max(0.0, dot(N, normalize(diffuseLightPosition)));
     vec4 diffuse = diffuseComponent * nDotVP;
     
@@ -44,13 +43,12 @@ void main()
     vec3 H = normalize(L+E);
     float Ks = pow(max(dot(N, H), 0.0), shininess);
     vec4 specular = Ks*specularComponent;
+    
     if( dot(L, N) < 0.0 ) {
         specular = vec4(0.0, 0.0, 0.0, 1.0);
     }
     
-    /* add ambient and specular components here as in:
-     gl_FragColor = (ambient + diffuse + specular) * texture2D(texture, texCoordOut);
-     */
+    
     gl_FragColor = (ambient + diffuse + specular) * texture2D(texture, texCoordOut);
     gl_FragColor.a = 1.0;
 }

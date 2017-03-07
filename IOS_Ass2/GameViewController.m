@@ -165,7 +165,7 @@ bool isDay = true;
     if (sender.state == UIGestureRecognizerStateRecognized) {
         NSLog(@"double tapped it");
         xMovement = 0;
-        zMovement = -10;
+        zMovement = -10.0f;
         xRotation = 0;
         
         if(isDay){
@@ -283,7 +283,7 @@ bool isDay = true;
     uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX] = glGetUniformLocation(_program, "modelViewProjectionMatrix");
     uniforms[UNIFORM_NORMAL_MATRIX] = glGetUniformLocation(_program, "normalMatrix");
     uniforms[UNIFORM_MODELVIEW_MATRIX] = glGetUniformLocation(_program, "modelViewMatrix");
-    /* more needed here... */
+ 
     uniforms[UNIFORM_TEXTURE] = glGetUniformLocation(_program, "texture");
     uniforms[UNIFORM_FLASHLIGHT_POSITION] = glGetUniformLocation(_program, "flashlightPosition");
     uniforms[UNIFORM_DIFFUSE_LIGHT_POSITION] = glGetUniformLocation(_program, "diffuseLightPosition");
@@ -293,11 +293,11 @@ bool isDay = true;
     uniforms[UNIFORM_SPECULAR_COMPONENT] = glGetUniformLocation(_program, "specularComponent");
     
     // Set up lighting parameters
-    flashlightPosition = GLKVector3Make(0.0, 0.0, 5.0);
+    flashlightPosition = GLKVector3Make(0.0, 0.0, 0.1f);
     diffuseLightPosition = GLKVector3Make(0.0, 1.0, 1.0);
     diffuseComponent = diffuseDay;
     shininess = 50.0;
-    specularComponent = GLKVector4Make(1.0f, 1.0, 0.4, 1.0);
+    specularComponent = GLKVector4Make(1.0f, 1.0, 0.6, 1.0);
     ambientComponent = ambientDay;
     
     /*
@@ -416,7 +416,7 @@ bool isDay = true;
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
     //clear the display
-    glClearColor(0.65f, 0.65f, 0.65f, 1.0f); //set background color (I remember this from GDX)
+    glClearColor(0.3f, 0.1f, 0.1, 1.0f); //set background color (I remember this from GDX)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear
 
     
@@ -437,23 +437,18 @@ float moveSpeed = 0;
     
     float aspect = fabs(self.view.bounds.size.width / self.view.bounds.size.height);
     GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(65.0f), aspect, 0.1f, 100.0f);
-    
-    self.effect.transform.projectionMatrix = projectionMatrix;
-    
     GLKMatrix4 baseModelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, 0.0f);
-    //turn to face
+    
+    //simulate camera rotation
     baseModelViewMatrix = GLKMatrix4Rotate(baseModelViewMatrix, xRotation, 0.0f, 1.0f, 0.0f);
-    //move
-   // a-floor(a/b)*b
-    //6.28319
-    //NSLog(@"rotation: %f", xRotation);
+
+    //player movement
     zMovement += moveSpeed * cosf(xRotation);
     xMovement += moveSpeed * -sinf(xRotation);
     GLKMatrix4 baseModelViewMatrix2 = GLKMatrix4MakeTranslation(xMovement, 0.0f, zMovement);
     baseModelViewMatrix = GLKMatrix4Multiply(baseModelViewMatrix, baseModelViewMatrix2);
     
-    // Compute the model view matrix for the object rendered with ES2
-    //GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, 1.5f);
+    //set model postion
     GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(gameObject.position.x, gameObject.position.y, gameObject.position.z);
     
     //rotate the crate
@@ -463,17 +458,17 @@ float moveSpeed = 0;
     }
 
     
-    
+    //model rotation
     modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, gameObject.rotation.x+gameObject.modelRotation.x, 1, 0,0);
     modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, gameObject.rotation.y+gameObject.modelRotation.y, 0, 1,0);
     modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, gameObject.rotation.z+gameObject.modelRotation.z, 0, 0,1);
+    
+    //model scale
     modelViewMatrix = GLKMatrix4Scale(modelViewMatrix, gameObject.scale.x, gameObject.scale.y, gameObject.scale.z);
-   // modelViewMatrix = GLKMatrix4Scale(modelViewMatrix, RENDER_MODEL_SCALE, RENDER_MODEL_SCALE, RENDER_MODEL_SCALE);
-    modelViewMatrix = GLKMatrix4Scale(modelViewMatrix, 1.0f, 1.0f, 1.0f); //temp; should use object scale
+    
     modelViewMatrix = GLKMatrix4Multiply(baseModelViewMatrix, modelViewMatrix);
     
     _normalMatrix = GLKMatrix3InvertAndTranspose(GLKMatrix4GetMatrix3(modelViewMatrix), NULL);
-    
     _modelViewProjectionMatrix = GLKMatrix4Multiply(projectionMatrix, modelViewMatrix);
 
     
@@ -500,16 +495,6 @@ float moveSpeed = 0;
  
 }
 
-
-/*
- sets up the vertex array and texture info
-params:
-    position array
-    texture array
-    normals array
-    number of vertices
-    texture name
- */
 -(VertexInfo)setupVertices :(GLfloat*)posArray :(GLfloat*)texArray :(GLfloat*)normArray :(int)vertexNum :(NSString*) textureName
 {
     VertexInfo vertexInfoStruct;
