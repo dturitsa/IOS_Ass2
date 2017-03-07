@@ -1,4 +1,4 @@
-//
+
 //  GameViewController.m
 //  IOS_Ass2
 //
@@ -99,6 +99,11 @@ GLint uniforms[NUM_UNIFORMS];
     view.context = self.context;
     view.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     
+    //detectdrag
+    UIPanGestureRecognizer *panRecognizer;
+    panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(dragging:)];
+    [self.view addGestureRecognizer:panRecognizer];
+    
     [self setupGame];
     [self setupGL];
 }
@@ -110,6 +115,36 @@ GLint uniforms[NUM_UNIFORMS];
     if ([EAGLContext currentContext] == self.context) {
         [EAGLContext setCurrentContext:nil];
     }
+}
+
+CGPoint originalLocation;
+float xMovement, zMovement;
+float xRotation;
+CGPoint oldRotation;
+//drag-rotate detection
+-(void)dragging:(UIPanGestureRecognizer *)gesture
+{
+
+     if(gesture.state == UIGestureRecognizerStateBegan)
+        {
+            oldRotation = [gesture locationInView:gesture.view];
+        }
+    CGPoint newCoord = [gesture locationInView:gesture.view];
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    xRotation += newCoord.x / screenRect.size.width - oldRotation.x / screenRect.size.width;
+    //moveSpeed = newCoord.y / screenRect.size.width - oldRotation.y / screenRect.size.width;
+    moveSpeed = .7f - newCoord.y / screenRect.size.height;
+    NSLog(@"movespeed: %f", moveSpeed);
+    moveSpeed *= .05f;
+    oldRotation = [gesture locationInView:gesture.view];
+    
+    if(gesture.state == UIGestureRecognizerStateEnded)
+    {
+        moveSpeed = 0;
+    }
+    
+
+    
 }
 
 - (void)didReceiveMemoryWarning
@@ -156,39 +191,53 @@ GLint uniforms[NUM_UNIFORMS];
     //testing for dynamic model spawning;
     GameObject *rotatingCube = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:rotatingCube];
-    rotatingCube.position = GLKVector3Make(0.0f, 0.0f, 0.0f);
-    rotatingCube.scale = GLKVector3Make(1,1,1);
+    rotatingCube.position = GLKVector3Make(0.0f, 0.5f, 8.0f);
+    rotatingCube.scale = GLKVector3Make(.3f,.3f,.3f);
     rotatingCube.modelName = @"crate";
     rotatingCube.textureName = @"crate.jpg";
     
     //setup maze walls
     GameObject *wall = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:wall];
-    wall.position = GLKVector3Make(-2.0f, -2.0f, 0.0f);
-    wall.scale = GLKVector3Make(1,1,4);
+    wall.position = GLKVector3Make(-2.0f, 0, 0.0f);
+    wall.scale = GLKVector3Make(1,1,5);
     wall.modelName = @"wall";
-    wall.textureName = @"cubeTexture.png";
+    wall.textureName = @"redBrickTexture.jpg";
     
     GameObject *wall1 = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:wall1];
-    wall1.position = GLKVector3Make(2.0f, -2.0f, 0.0f);
+    wall1.position = GLKVector3Make(2.0f, 0, 2.0f);
     wall1.scale = GLKVector3Make(1,1,4);
     wall1.modelName = @"wall";
-    wall1.textureName = @"cubeTexture.png";
+    wall1.textureName = @"brownBrickTexture2.jpg";
     
     GameObject *wall2 = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:wall2];
-    wall2.position = GLKVector3Make(-4.5f, -2.0f, 2.0f);
-    wall2.scale = GLKVector3Make(4,1,1);
+    wall2.position = GLKVector3Make(3.0f, 0.0f, -6.0f);
+    wall2.scale = GLKVector3Make(6,1,1);
     wall2.modelName = @"wall";
-    wall2.textureName = @"cubeTexture.png";
+    wall2.textureName = @"brownBrickTexture2.jpg";
     
     GameObject *wall3 = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:wall3];
-    wall3.position = GLKVector3Make(4.5f, -2.0f, 2.0f);
-    wall3.scale = GLKVector3Make(4,1,1);
+    wall3.position = GLKVector3Make(4.05f, 0, -1.05f);
+    wall3.scale = GLKVector3Make(3,1,1);
     wall3.modelName = @"wall";
-    wall3.textureName = @"crate.jpg";
+    wall3.textureName = @"colorBrickTexture.jpg";
+    
+    GameObject *wall4 = [[GameObject alloc] init];
+    [_gameObjectsToAdd addObject:wall4];
+    wall4.position = GLKVector3Make(9.5f, 0, -2.0f);
+    wall4.scale = GLKVector3Make(1,1,4);
+    wall4.modelName = @"wall";
+    wall4.textureName = @"brownBrickTexture2.jpg";
+    
+    GameObject *wall5 = [[GameObject alloc] init];
+    [_gameObjectsToAdd addObject:wall5];
+    wall5.position = GLKVector3Make(5.0f, 0.0f, 5.0f);
+    wall5.scale = GLKVector3Make(4,1,1);
+    wall5.modelName = @"wall";
+    wall5.textureName = @"brownBrickTexture2.jpg";
 
 
 }
@@ -321,6 +370,7 @@ GLint uniforms[NUM_UNIFORMS];
 - (void)update
 {
 
+    
     for(id o in _gameObjectsToAdd)
     {
         [_gameObjects addObject:o];
@@ -342,8 +392,10 @@ GLint uniforms[NUM_UNIFORMS];
         [self renderObject:(GameObject*)o];
     }
 }
-
-float movement = 0;
+//player movement info
+float xMovement = 0;
+float zMovement = -10.0f;
+float moveSpeed = 0;
 -(void)renderObject:(GameObject*)gameObject
 {
     
@@ -357,14 +409,19 @@ float movement = 0;
     
     GLKMatrix4 baseModelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, 0.0f);
     //turn to face
-    baseModelViewMatrix = GLKMatrix4Rotate(baseModelViewMatrix, .1f, 0.0f, 1.0f, 0.0f);
+    baseModelViewMatrix = GLKMatrix4Rotate(baseModelViewMatrix, xRotation, 0.0f, 1.0f, 0.0f);
     //move
-    GLKMatrix4 baseModelViewMatrix2 = GLKMatrix4MakeTranslation(0.0f, 0.0f, -10.0f);
+   // a-floor(a/b)*b
+    //6.28319
+    //NSLog(@"rotation: %f", xRotation);
+    zMovement += moveSpeed * cosf(xRotation);
+    xMovement += moveSpeed * -sinf(xRotation);
+    GLKMatrix4 baseModelViewMatrix2 = GLKMatrix4MakeTranslation(xMovement, 0.0f, zMovement);
     baseModelViewMatrix = GLKMatrix4Multiply(baseModelViewMatrix, baseModelViewMatrix2);
     
     // Compute the model view matrix for the object rendered with ES2
     //GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, 1.5f);
-    GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(gameObject.position.x, gameObject.position.y, 1.5f);
+    GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(gameObject.position.x, gameObject.position.y, gameObject.position.z);
     
     //rotate the crate
     if ([gameObject.modelName isEqualToString:@"crate"]){
@@ -472,7 +529,7 @@ params:
     // Load in and set texture
     /* use setupTexture to create crate texture */
     vertexInfoStruct.textureHandle = [self setupTexture:textureName];
-
+    NSLog(textureName);
     
     return vertexInfoStruct;
 }

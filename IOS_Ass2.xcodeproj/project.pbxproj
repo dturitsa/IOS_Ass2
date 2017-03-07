@@ -21,6 +21,11 @@
 		1B400C2A1E6D594200DAA5AA /* cubeTexture.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B400C291E6D594200DAA5AA /* cubeTexture.png */; };
 		1B400C2C1E6D768700DAA5AA /* crate.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 1B400C2B1E6D768600DAA5AA /* crate.jpg */; };
 		1B400C2E1E6D864100DAA5AA /* sphereTexture2.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B400C2D1E6D864100DAA5AA /* sphereTexture2.png */; };
+		7E74597C1E6E5DD5002B4171 /* grayBrickTexture.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7E7459791E6E5DD5002B4171 /* grayBrickTexture.jpg */; };
+		7E74597E1E6E5DD5002B4171 /* redBrickTexture.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7E74597B1E6E5DD5002B4171 /* redBrickTexture.jpg */; };
+		7E7459801E6E610A002B4171 /* brownBrickTexture.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7E74597F1E6E610A002B4171 /* brownBrickTexture.jpg */; };
+		7E7459821E6E617C002B4171 /* brownBrickTexture2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7E7459811E6E617C002B4171 /* brownBrickTexture2.jpg */; };
+		7E7459841E6E61C9002B4171 /* colorBrickTexture.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7E7459831E6E61C8002B4171 /* colorBrickTexture.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +49,11 @@
 		1B400C291E6D594200DAA5AA /* cubeTexture.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cubeTexture.png; sourceTree = "<group>"; };
 		1B400C2B1E6D768600DAA5AA /* crate.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = crate.jpg; sourceTree = "<group>"; };
 		1B400C2D1E6D864100DAA5AA /* sphereTexture2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sphereTexture2.png; sourceTree = "<group>"; };
+		7E7459791E6E5DD5002B4171 /* grayBrickTexture.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = grayBrickTexture.jpg; path = ../../../Downloads/grayBrickTexture.jpg; sourceTree = "<group>"; };
+		7E74597B1E6E5DD5002B4171 /* redBrickTexture.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = redBrickTexture.jpg; path = ../../../Downloads/redBrickTexture.jpg; sourceTree = "<group>"; };
+		7E74597F1E6E610A002B4171 /* brownBrickTexture.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = brownBrickTexture.jpg; path = ../../../Downloads/brownBrickTexture.jpg; sourceTree = "<group>"; };
+		7E7459811E6E617C002B4171 /* brownBrickTexture2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = brownBrickTexture2.jpg; path = ../../../Downloads/brownBrickTexture2.jpg; sourceTree = "<group>"; };
+		7E7459831E6E61C8002B4171 /* colorBrickTexture.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = colorBrickTexture.jpg; path = ../../../Downloads/colorBrickTexture.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,15 +91,20 @@
 				1B400BE31E6D1A1E00DAA5AA /* AppDelegate.m */,
 				1B400BE51E6D1A1E00DAA5AA /* Shader.fsh */,
 				1B400BE71E6D1A1E00DAA5AA /* Shader.vsh */,
-				1B400C2B1E6D768600DAA5AA /* crate.jpg */,
-				1B400C2D1E6D864100DAA5AA /* sphereTexture2.png */,
-				1B400C291E6D594200DAA5AA /* cubeTexture.png */,
 				1B400BE91E6D1A1E00DAA5AA /* GameViewController.h */,
 				1B400BEA1E6D1A1E00DAA5AA /* GameViewController.m */,
 				1B400BEC1E6D1A1E00DAA5AA /* Main.storyboard */,
 				1B400BEF1E6D1A1E00DAA5AA /* Assets.xcassets */,
 				1B400BF11E6D1A1E00DAA5AA /* LaunchScreen.storyboard */,
 				1B400BF41E6D1A1E00DAA5AA /* Info.plist */,
+				1B400C2B1E6D768600DAA5AA /* crate.jpg */,
+				1B400C2D1E6D864100DAA5AA /* sphereTexture2.png */,
+				1B400C291E6D594200DAA5AA /* cubeTexture.png */,
+				7E7459811E6E617C002B4171 /* brownBrickTexture2.jpg */,
+				7E7459831E6E61C8002B4171 /* colorBrickTexture.jpg */,
+				7E7459791E6E5DD5002B4171 /* grayBrickTexture.jpg */,
+				7E74597B1E6E5DD5002B4171 /* redBrickTexture.jpg */,
+				7E74597F1E6E610A002B4171 /* brownBrickTexture.jpg */,
 				1B400BDF1E6D1A1E00DAA5AA /* Supporting Files */,
 				1B400BFA1E6D1BE000DAA5AA /* GameObject.m */,
 				1B400BFC1E6D1C0300DAA5AA /* GameObject.h */,
@@ -170,11 +185,16 @@
 				1B400BE81E6D1A1E00DAA5AA /* Shader.vsh in Resources */,
 				1B400C2A1E6D594200DAA5AA /* cubeTexture.png in Resources */,
 				1B400C281E6D592E00DAA5AA /* Downloads in Resources */,
+				7E7459801E6E610A002B4171 /* brownBrickTexture.jpg in Resources */,
 				1B400BF01E6D1A1E00DAA5AA /* Assets.xcassets in Resources */,
 				1B400BF31E6D1A1E00DAA5AA /* LaunchScreen.storyboard in Resources */,
+				7E74597C1E6E5DD5002B4171 /* grayBrickTexture.jpg in Resources */,
 				1B400BE61E6D1A1E00DAA5AA /* Shader.fsh in Resources */,
+				7E74597E1E6E5DD5002B4171 /* redBrickTexture.jpg in Resources */,
+				7E7459821E6E617C002B4171 /* brownBrickTexture2.jpg in Resources */,
 				1B400C2E1E6D864100DAA5AA /* sphereTexture2.png in Resources */,
 				1B400C2C1E6D768700DAA5AA /* crate.jpg in Resources */,
+				7E7459841E6E61C9002B4171 /* colorBrickTexture.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
