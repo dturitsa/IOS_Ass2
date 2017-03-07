@@ -56,10 +56,12 @@ GLint uniforms[NUM_UNIFORMS];
     /* specify lighting parameters here...e.g., GLKVector3 flashlightPosition; */
     GLKVector3 flashlightPosition;
     GLKVector3 diffuseLightPosition;
-    GLKVector4 diffuseComponent;
+    GLKVector4 diffuseComponent, diffuseDay, diffuseNight;
     float shininess;
     GLKVector4 specularComponent;
-    GLKVector4 ambientComponent;
+    GLKVector4 ambientComponent, ambientDay, ambientNight;
+
+
 }
 @property (strong, nonatomic) EAGLContext *context;
 @property (strong, nonatomic) GLKBaseEffect *effect;
@@ -104,6 +106,17 @@ GLint uniforms[NUM_UNIFORMS];
     panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(dragging:)];
     [self.view addGestureRecognizer:panRecognizer];
     
+    //detec taps
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
+    tapGesture.numberOfTapsRequired = 2;
+    [self.view addGestureRecognizer:tapGesture];
+    
+    //initialize night and day shader parameters
+    ambientDay = GLKVector4Make(0.5, 0.5, 0.5, 1.0);
+    diffuseDay = GLKVector4Make(0.8, 0.5, 0.5, 1.0);
+    ambientNight = GLKVector4Make(0.2, 0.2, 0.2, 1.0);
+    diffuseNight = GLKVector4Make(0.1, 0.1, 0.5, 1.0);
+    
     [self setupGame];
     [self setupGL];
 }
@@ -134,7 +147,7 @@ CGPoint oldRotation;
     xRotation += newCoord.x / screenRect.size.width - oldRotation.x / screenRect.size.width;
     //moveSpeed = newCoord.y / screenRect.size.width - oldRotation.y / screenRect.size.width;
     moveSpeed = .7f - newCoord.y / screenRect.size.height;
-    NSLog(@"movespeed: %f", moveSpeed);
+    //NSLog(@"movespeed: %f", moveSpeed);
     moveSpeed *= .05f;
     oldRotation = [gesture locationInView:gesture.view];
     
@@ -143,8 +156,28 @@ CGPoint oldRotation;
         moveSpeed = 0;
     }
     
+}
 
-    
+bool isDay = true;
+
+//handle taps
+- (void)handleTapGesture:(UITapGestureRecognizer *)sender {
+    if (sender.state == UIGestureRecognizerStateRecognized) {
+        NSLog(@"double tapped it");
+        xMovement = 0;
+        zMovement = -10;
+        xRotation = 0;
+        
+        if(isDay){
+            ambientComponent = GLKVector4Make(0.2, 0.2, 0.2, 1.0);
+            diffuseComponent = GLKVector4Make(0.1, 0.1, 0.5, 1.0);
+        }else{
+            ambientComponent = GLKVector4Make(0.5, 0.5, 0.5, 1.0);
+            diffuseComponent = GLKVector4Make(0.8, 0.2, 0.2, 1.0);
+        }
+        isDay = !isDay;
+        
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -216,7 +249,7 @@ CGPoint oldRotation;
     wall2.position = GLKVector3Make(3.0f, 0.0f, -6.0f);
     wall2.scale = GLKVector3Make(6,1,1);
     wall2.modelName = @"wall";
-    wall2.textureName = @"brownBrickTexture2.jpg";
+    wall2.textureName = @"crate.jpg";
     
     GameObject *wall3 = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:wall3];
@@ -260,18 +293,18 @@ CGPoint oldRotation;
     uniforms[UNIFORM_SPECULAR_COMPONENT] = glGetUniformLocation(_program, "specularComponent");
     
     // Set up lighting parameters
-    /* set values, e.g., flashlightPosition = GLKVector3Make(0.0, 0.0, 1.0); */
-    flashlightPosition = GLKVector3Make(0.0, 0.0, 1.0);
-    diffuseLightPosition = GLKVector3Make(0.0, 1.0, 0.0);
-    diffuseComponent = GLKVector4Make(0.8, 0.1, 0.1, 1.0);
-    shininess = 200.0;
-    specularComponent = GLKVector4Make(1.0, 1.0, 1.0, 1.0);
-    ambientComponent = GLKVector4Make(0.5, 0.5, 0.5, 1.0);
+    flashlightPosition = GLKVector3Make(0.0, 0.0, 5.0);
+    diffuseLightPosition = GLKVector3Make(0.0, 1.0, 1.0);
+    diffuseComponent = diffuseDay;
+    shininess = 50.0;
+    specularComponent = GLKVector4Make(1.0f, 1.0, 0.4, 1.0);
+    ambientComponent = ambientDay;
     
+    /*
     self.effect = [[GLKBaseEffect alloc] init];
     self.effect.light0.enabled = GL_TRUE;
     self.effect.light0.diffuseColor = GLKVector4Make(1.0f, 0.4f, 0.4f, 1.0f);
-    
+    */
     glEnable(GL_DEPTH_TEST);
 
 }
