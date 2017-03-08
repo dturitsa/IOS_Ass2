@@ -177,6 +177,8 @@ bool isDay = true;
         }
         isDay = !isDay;
         
+        displayMinimap = !displayMinimap;
+        
     }
 }
 
@@ -213,14 +215,14 @@ bool isDay = true;
     
     //create and init player
     //  NSLog(@"initializing player");
-    /*
+    
     _player = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:_player];
-    _player.position = GLKVector3Make(0.9f, 0.0f, 0.0f);
-    _player.scale = GLKVector3Make(1,1,1);
+    _player.position = GLKVector3Make(0.0f, 0.0f, 0.0f);
+    _player.scale = GLKVector3Make(.7f,.7f,.7f);
     _player.modelName = @"player";
     _player.textureName = @"cubeTexture.png";
-    */
+    
     //testing for dynamic model spawning;
     GameObject *rotatingCube = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:rotatingCube];
@@ -264,6 +266,7 @@ bool isDay = true;
     wall4.scale = GLKVector3Make(1,1,4);
     wall4.modelName = @"wall";
     wall4.textureName = @"brownBrickTexture2.jpg";
+    
     
     GameObject *wall5 = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:wall5];
@@ -389,12 +392,7 @@ bool isDay = true;
         vertexNum = sizeof(cube_pos) / 12;
         object.modelHandle = [self setupVertices :cube_pos :cube_tex :cube_norm :vertexNum :object.textureName];
     }
-    
-    
-    
-    
-    
-    
+  
     
 }
 
@@ -413,65 +411,88 @@ bool isDay = true;
 
 }
 
+bool displayMinimap = false;
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    //clear the display
-    glScissor(0, 200, 500, 500);
+    //set screen size
+    CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width * [[UIScreen mainScreen] scale];
+    CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height * [[UIScreen mainScreen] scale];
+    
+    
+    //1st viewport (main gameview)
+    //glScissor(0, screenHeight / 2, screenWidth, screenHeight/2);
+    glScissor(0, 0, screenWidth, screenHeight);
     glEnable(GL_SCISSOR_TEST);
     glClearColor(0.3f, 0.1f, 0.1, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear
+
     
-    
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
-    glViewport(screenRect.size.width, 0, screenRect.size.width, screenRect.size.height);
+    //glViewport(0, screenHeight / 2, screenWidth, screenHeight/2);
+    glViewport(0, 0, screenWidth, screenHeight);
     for(id o in _gameObjects)
     {
         [self renderObject:(GameObject*)o];
     }
-    glScissor(0, -100, 500, 500);
-    glEnable(GL_SCISSOR_TEST);
-    glClearColor(0.1f, 0.4f, 0.1, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear
-    glViewport(200, 0, 200, 200);
-    for(id o in _gameObjects)
-    {
-        [self renderObject2:(GameObject*)o];
+    
+    //2nd viewport (minimap)
+    if(displayMinimap){
+        glScissor(screenWidth/2, 0, screenWidth/2, screenWidth/2);
+        glViewport(screenWidth/2, 0, screenWidth/2, screenWidth/2);
+        glEnable(GL_SCISSOR_TEST);
+        glClearColor(0.5f, 0.1f, 0.1, 0.2f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear
+        
+        for(id o in _gameObjects)
+        {
+            [self renderObject2:(GameObject*)o];
+        }
     }
+
 }
 
 -(void)renderObject2:(GameObject*)gameObject{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    //glBindFramebufferOES(GL_FRAMEBUFFER_OES, defaultFramebuffer);
-   
     
     glBindVertexArrayOES(gameObject.modelHandle.vArray);
     glUseProgram(_program);
     
-    float aspect = fabs(self.view.bounds.size.width / self.view.bounds.size.height);
-    GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(65.0f), aspect, 0.1f, 100.0f);
-    GLKMatrix4 baseModelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, 0.0f);
+    float aspect = fabs(self.view.bounds.size.width / self.view.bounds.size.width);
+    GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(7.0f), aspect, 0.1f, 300.0f);
+    GLKMatrix4 baseModelViewMatrix = GLKMatrix4MakeTranslation(-4.0f, 4.0f, 0.0f);
     
-    //simulate camera rotation
-    baseModelViewMatrix = GLKMatrix4Rotate(baseModelViewMatrix, xRotation, 0.0f, 1.0f, 0.0f);
+    if ([gameObject.modelName isEqualToString:@"player"])
+    {
+        //player movement
+        zMovement += moveSpeed * cosf(xRotation);
+        xMovement += moveSpeed * -sinf(xRotation);
+        GLKMatrix4 baseModelViewMatrix2 = GLKMatrix4MakeTranslation(-xMovement, zMovement, 0);
+        baseModelViewMatrix = GLKMatrix4Multiply(baseModelViewMatrix, baseModelViewMatrix2);
+    }
+
     
-    //player movement
-    zMovement += moveSpeed * cosf(xRotation);
-    xMovement += moveSpeed * -sinf(xRotation);
-    GLKMatrix4 baseModelViewMatrix2 = GLKMatrix4MakeTranslation(xMovement, 0.0f, zMovement);
+    
+    
+    //baseModelViewMatrix = GLKMatrix4Rotate(baseModelViewMatrix, 1.5708, 1.0f, 0.0f, 0.0f);
+    baseModelViewMatrix = GLKMatrix4Rotate(baseModelViewMatrix, 1.5708f, 1.0f, 0.0f, 0.0f);
+    GLKMatrix4 baseModelViewMatrix2 = GLKMatrix4MakeTranslation(0, -200.0f, 0);
     baseModelViewMatrix = GLKMatrix4Multiply(baseModelViewMatrix, baseModelViewMatrix2);
     
     //set model postion
     GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(gameObject.position.x, gameObject.position.y, gameObject.position.z);
     
+    
     //rotate the crate
     if ([gameObject.modelName isEqualToString:@"crate"]){
         modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
-        _rotation += self.timeSinceLastUpdate * 0.3f;
+       // _rotation += self.timeSinceLastUpdate * 0.3f;
     }
     
     
     //model rotation
+    if ([gameObject.modelName isEqualToString:@"player"])
+    {
+        modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, -xRotation, 0, 1,0);
+    }
+    
     modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, gameObject.rotation.x+gameObject.modelRotation.x, 1, 0,0);
     modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, gameObject.rotation.y+gameObject.modelRotation.y, 0, 1,0);
     modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, gameObject.rotation.z+gameObject.modelRotation.z, 0, 0,1);
@@ -537,6 +558,10 @@ float moveSpeed = 0;
     if ([gameObject.modelName isEqualToString:@"crate"]){
         modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
         _rotation += self.timeSinceLastUpdate * 0.3f;
+    }
+    //don't render the player (player model used for minimap only
+    if ([gameObject.modelName isEqualToString:@"player"]){
+        return;
     }
 
     
@@ -607,9 +632,7 @@ float moveSpeed = 0;
             mixedArray[i] = texArray[n];
             n++;
         }
-        //NSLog(@"%.2f", mixedArray[i]);
     }
- //   NSLog(@"%lu", sizeof(sphere_pos));
     
     //load array into buffer
     glBufferData(GL_ARRAY_BUFFER, sizeof(mixedArray), mixedArray, GL_STATIC_DRAW);
@@ -630,7 +653,6 @@ float moveSpeed = 0;
     // Load in and set texture
     /* use setupTexture to create crate texture */
     vertexInfoStruct.textureHandle = [self setupTexture:textureName];
-    NSLog(textureName);
     
     return vertexInfoStruct;
 }
