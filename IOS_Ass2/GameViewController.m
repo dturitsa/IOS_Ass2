@@ -416,15 +416,97 @@ bool isDay = true;
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
     //clear the display
-    glClearColor(0.3f, 0.1f, 0.1, 1.0f); //set background color (I remember this from GDX)
+    glScissor(0, 200, 500, 500);
+    glEnable(GL_SCISSOR_TEST);
+    glClearColor(0.3f, 0.1f, 0.1, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear
-
     
+    
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    glViewport(screenRect.size.width, 0, screenRect.size.width, screenRect.size.height);
     for(id o in _gameObjects)
     {
         [self renderObject:(GameObject*)o];
     }
+    glScissor(0, -100, 500, 500);
+    glEnable(GL_SCISSOR_TEST);
+    glClearColor(0.1f, 0.4f, 0.1, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear
+    glViewport(200, 0, 200, 200);
+    for(id o in _gameObjects)
+    {
+        [self renderObject2:(GameObject*)o];
+    }
 }
+
+-(void)renderObject2:(GameObject*)gameObject{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    //glBindFramebufferOES(GL_FRAMEBUFFER_OES, defaultFramebuffer);
+   
+    
+    glBindVertexArrayOES(gameObject.modelHandle.vArray);
+    glUseProgram(_program);
+    
+    float aspect = fabs(self.view.bounds.size.width / self.view.bounds.size.height);
+    GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(65.0f), aspect, 0.1f, 100.0f);
+    GLKMatrix4 baseModelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, 0.0f);
+    
+    //simulate camera rotation
+    baseModelViewMatrix = GLKMatrix4Rotate(baseModelViewMatrix, xRotation, 0.0f, 1.0f, 0.0f);
+    
+    //player movement
+    zMovement += moveSpeed * cosf(xRotation);
+    xMovement += moveSpeed * -sinf(xRotation);
+    GLKMatrix4 baseModelViewMatrix2 = GLKMatrix4MakeTranslation(xMovement, 0.0f, zMovement);
+    baseModelViewMatrix = GLKMatrix4Multiply(baseModelViewMatrix, baseModelViewMatrix2);
+    
+    //set model postion
+    GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(gameObject.position.x, gameObject.position.y, gameObject.position.z);
+    
+    //rotate the crate
+    if ([gameObject.modelName isEqualToString:@"crate"]){
+        modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
+        _rotation += self.timeSinceLastUpdate * 0.3f;
+    }
+    
+    
+    //model rotation
+    modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, gameObject.rotation.x+gameObject.modelRotation.x, 1, 0,0);
+    modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, gameObject.rotation.y+gameObject.modelRotation.y, 0, 1,0);
+    modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, gameObject.rotation.z+gameObject.modelRotation.z, 0, 0,1);
+    
+    //model scale
+    modelViewMatrix = GLKMatrix4Scale(modelViewMatrix, gameObject.scale.x, gameObject.scale.y, gameObject.scale.z);
+    
+    modelViewMatrix = GLKMatrix4Multiply(baseModelViewMatrix, modelViewMatrix);
+    
+    _normalMatrix = GLKMatrix3InvertAndTranspose(GLKMatrix4GetMatrix3(modelViewMatrix), NULL);
+    _modelViewProjectionMatrix = GLKMatrix4Multiply(projectionMatrix, modelViewMatrix);
+    
+    
+    // Set up uniforms
+    glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _modelViewProjectionMatrix.m);
+    glUniformMatrix3fv(uniforms[UNIFORM_NORMAL_MATRIX], 1, 0, _normalMatrix.m);
+    glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEW_MATRIX], 1, 0, _modelViewProjectionMatrix.m);
+    /* set lighting parameters... */
+    glUniform3fv(uniforms[UNIFORM_FLASHLIGHT_POSITION], 1, flashlightPosition.v);
+    glUniform3fv(uniforms[UNIFORM_DIFFUSE_LIGHT_POSITION], 1, diffuseLightPosition.v);
+    glUniform4fv(uniforms[UNIFORM_DIFFUSE_COMPONENT], 1, diffuseComponent.v);
+    glUniform1f(uniforms[UNIFORM_SHININESS], shininess);
+    glUniform4fv(uniforms[UNIFORM_SPECULAR_COMPONENT], 1, specularComponent.v);
+    glUniform4fv(uniforms[UNIFORM_AMBIENT_COMPONENT], 1, ambientComponent.v);
+    
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, gameObject.modelHandle.textureHandle);
+    glUniform1i(uniforms[UNIFORM_TEXTURE], 0);
+    
+    //draw!
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gameObject.modelHandle.vBuffer);
+    glDrawArrays(GL_TRIANGLES, 0, gameObject.modelHandle.length);
+    glBindVertexArrayOES(0);
+}
+
 //player movement info
 float xMovement = 0;
 float zMovement = -10.0f;
@@ -494,6 +576,7 @@ float moveSpeed = 0;
     glBindVertexArrayOES(0);
  
 }
+
 
 -(VertexInfo)setupVertices :(GLfloat*)posArray :(GLfloat*)texArray :(GLfloat*)normArray :(int)vertexNum :(NSString*) textureName
 {

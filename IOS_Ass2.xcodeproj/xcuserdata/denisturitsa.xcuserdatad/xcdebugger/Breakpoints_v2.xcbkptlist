@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "IOS_Ass2/GameViewController.m"
-            timestampString = "510601806.623418"
+            timestampString = "510691589.988626"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "488"
-            endingLineNumber = "488"
+            startingLineNumber = "570"
+            endingLineNumber = "570"
             landmarkName = "-renderObject:"
             landmarkType = "7">
          </BreakpointContent>
