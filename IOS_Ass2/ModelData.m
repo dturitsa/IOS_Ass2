@@ -9,6 +9,27 @@
 #import <Foundation/Foundation.h>
 #import <GLKit/GLKit.h>
 
+static GLfloat playerIndicator_v[] = {0.470106f,0.0f,0.70516f,0.470107f,0.0f,-0.705159f,-0.940213f,0.0f,0.0f,
+};
+
+static GLfloat playerIndicator_vt[] = {0.0917f,0.0976f,0.9473f,0.0976f,0.5195f,0.9532f,
+};
+
+static GLfloat playerIndicator_vn[] = {0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,
+};
+
+
+static GLfloat background_v[] = {-1.0f,0.0f,-1.0f,0.999999f,0.0f,1.0f,1.000001f,0.0f,-1.0f,
+    -1.0f,0.0f,-1.0f,-1.0f,0.0f,0.999999f,0.999999f,0.0f,1.0f,
+};
+
+static GLfloat background_vt[] = {0.0f,0.0f,1.0f,1.0f,0.0f,1.0f,
+    0.0f,0.0f,1.0f,0.0f,1.0f,1.0f,
+};
+
+static GLfloat background_vn[] = {0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,
+    0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,
+};
 
 static GLfloat crate_v[] = {1.0f,-1.0f,-1.0f,-1.0f,-1.0f,1.0f,-1.0f,-1.0f,-1.0f,
     -1.0f,1.0f,-1.0f,0.999999f,1.0f,1.000001f,1.0f,1.0f,-0.999999f,

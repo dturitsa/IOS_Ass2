@@ -106,10 +106,16 @@ GLint uniforms[NUM_UNIFORMS];
     panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(dragging:)];
     [self.view addGestureRecognizer:panRecognizer];
     
-    //detec taps
+    //detec double tap  finger
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
     tapGesture.numberOfTapsRequired = 2;
     [self.view addGestureRecognizer:tapGesture];
+    
+    //detec double tap  finger
+    UITapGestureRecognizer *tapGesture2 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(minimapToggle:)];
+    tapGesture2.numberOfTapsRequired = 2;
+    tapGesture2.numberOfTouchesRequired = 2;
+    [self.view addGestureRecognizer:tapGesture2];
     
     //initialize night and day shader parameters
     ambientDay = GLKVector4Make(0.5, 0.5, 0.5, 1.0);
@@ -129,6 +135,8 @@ GLint uniforms[NUM_UNIFORMS];
         [EAGLContext setCurrentContext:nil];
     }
 }
+
+
 
 CGPoint originalLocation;
 float xMovement, zMovement;
@@ -157,29 +165,46 @@ CGPoint oldRotation;
     }
     
 }
+- (IBAction)dayToggle:(UISwitch *)sender {
+    if ([sender isOn]) {
+        ambientComponent = GLKVector4Make(0.5, 0.5, 0.5, 1.0);
+        diffuseComponent = GLKVector4Make(0.8, 0.2, 0.2, 1.0);
+    }else{
+        
+        ambientComponent = GLKVector4Make(0.2, 0.2, 0.2, 1.0);
+        diffuseComponent = GLKVector4Make(0.1, 0.1, 0.5, 1.0);
+    }
+}
+- (IBAction)fogToggle:(UISwitch *)sender {
+    if ([sender isOn]) {
+        
+    }else{
+        
+    }
+}
+- (IBAction)flashlightToggle:(UISwitch *)sender {
+    if ([sender isOn]) {
+        specularComponent = GLKVector4Make(1.0f, 1.0, 0.6, 1.0);
+    }else{
+        specularComponent = GLKVector4Make(0.0f, 0.0, 0.0, 1.0);
+    }
+}
 
 bool isDay = true;
 
-//handle taps
+//handle doubletaps
 - (void)handleTapGesture:(UITapGestureRecognizer *)sender {
     if (sender.state == UIGestureRecognizerStateRecognized) {
-        NSLog(@"double tapped it");
         xMovement = 0;
         zMovement = -10.0f;
         xRotation = 0;
-        
-        if(isDay){
-            ambientComponent = GLKVector4Make(0.2, 0.2, 0.2, 1.0);
-            diffuseComponent = GLKVector4Make(0.1, 0.1, 0.5, 1.0);
-        }else{
-            ambientComponent = GLKVector4Make(0.5, 0.5, 0.5, 1.0);
-            diffuseComponent = GLKVector4Make(0.8, 0.2, 0.2, 1.0);
-        }
-        isDay = !isDay;
-        
-        displayMinimap = !displayMinimap;
-        
     }
+}
+
+- (void)minimapToggle:(UITapGestureRecognizer *)sender {
+    if (sender.state == UIGestureRecognizerStateRecognized) {
+            displayMinimap = !displayMinimap;
+      }
 }
 
 - (void)didReceiveMemoryWarning
@@ -219,9 +244,10 @@ bool isDay = true;
     _player = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:_player];
     _player.position = GLKVector3Make(0.0f, 0.0f, 0.0f);
-    _player.scale = GLKVector3Make(.7f,.7f,.7f);
+    _player.scale = GLKVector3Make(1.2f,1.2f,1.2f);
+    _player.rotation = GLKVector3Make(0.0f,-1.5708f,0.0f);
     _player.modelName = @"player";
-    _player.textureName = @"cubeTexture.png";
+    _player.textureName = @"playerIconBackground.jpg";
     
     //testing for dynamic model spawning;
     GameObject *rotatingCube = [[GameObject alloc] init];
@@ -300,7 +326,7 @@ bool isDay = true;
     diffuseLightPosition = GLKVector3Make(0.0, 1.0, 1.0);
     diffuseComponent = diffuseDay;
     shininess = 50.0;
-    specularComponent = GLKVector4Make(1.0f, 1.0, 0.6, 1.0);
+    
     ambientComponent = ambientDay;
     
     /*
@@ -384,8 +410,8 @@ bool isDay = true;
     }
     else if ([object.modelName isEqualToString:@"player"])
     {
-        vertexNum = sizeof(cube_pos) / 12;
-        object.modelHandle = [self setupVertices :cube_pos :cube_tex :cube_norm :vertexNum :object.textureName];
+        vertexNum = sizeof(playerIndicator_v) / 12;
+        object.modelHandle = [self setupVertices :playerIndicator_v :playerIndicator_vt :playerIndicator_vn :vertexNum :object.textureName];
     }
     else if ([object.modelName isEqualToString:@"wall"])
     {
@@ -439,7 +465,7 @@ bool displayMinimap = false;
         glScissor(screenWidth/2, 0, screenWidth/2, screenWidth/2);
         glViewport(screenWidth/2, 0, screenWidth/2, screenWidth/2);
         glEnable(GL_SCISSOR_TEST);
-        glClearColor(0.5f, 0.1f, 0.1, 0.2f);
+        glClearColor(0.1f, 0.1f, 0.1, 0.2f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear
         
         for(id o in _gameObjects)
