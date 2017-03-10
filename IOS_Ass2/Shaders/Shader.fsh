@@ -44,9 +44,12 @@ void main()
     float Ks = pow(max(dot(N, H), 0.0), shininess);
     vec4 specular = Ks*specularComponent;
     
+    
     if( dot(L, N) < 0.0 ) {
         specular = vec4(0.0, 0.0, 0.0, 1.0);
     }
+    
+    //vec4 fog = vec4(0.5, 0.5, 0.5, 1.0);
     
     gl_FragColor = (ambient + diffuse + specular) * texture2D(texture, texCoordOut);
     gl_FragColor.a = 1.0;

@@ -249,7 +249,15 @@ bool isDay = true;
     _player.modelName = @"player";
     _player.textureName = @"playerIconBackground.jpg";
     
-    //testing for dynamic model spawning;
+    //setup floor
+    GameObject *floor = [[GameObject alloc] init];
+    [_gameObjectsToAdd addObject:floor];
+    floor.position = GLKVector3Make(4.0f, -1.0f, -1);
+    floor.scale = GLKVector3Make(9.0f,9.0f,9.0f);
+    floor.modelName = @"floor";
+    floor.textureName = @"dryGround.jpg";
+    
+    //setup rotating cube
     GameObject *rotatingCube = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:rotatingCube];
     rotatingCube.position = GLKVector3Make(0.0f, 0.5f, 8.0f);
@@ -418,7 +426,11 @@ bool isDay = true;
         vertexNum = sizeof(cube_pos) / 12;
         object.modelHandle = [self setupVertices :cube_pos :cube_tex :cube_norm :vertexNum :object.textureName];
     }
-  
+    else if ([object.modelName isEqualToString:@"floor"])
+    {
+        vertexNum = sizeof(background_v) / 12;
+        object.modelHandle = [self setupVertices :background_v :background_vt :background_vn :vertexNum :object.textureName];
+    }
     
 }
 

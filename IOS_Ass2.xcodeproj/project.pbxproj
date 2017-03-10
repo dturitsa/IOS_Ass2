@@ -27,6 +27,7 @@
 		1B400C371E6F1C9A00DAA5AA /* redBrickTexture.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 1B400C331E6F1C9A00DAA5AA /* redBrickTexture.jpg */; };
 		7ECF47D41E71F8F600F40547 /* stoneFloor.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7ECF47D31E71F8F600F40547 /* stoneFloor.jpg */; };
 		7ECF47D61E71F8FC00F40547 /* playerIconBackground.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7ECF47D51E71F8FC00F40547 /* playerIconBackground.jpg */; };
+		7ECF47D81E72385400F40547 /* dryGround.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7ECF47D71E72385400F40547 /* dryGround.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +57,7 @@
 		1B400C331E6F1C9A00DAA5AA /* redBrickTexture.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = redBrickTexture.jpg; sourceTree = "<group>"; };
 		7ECF47D31E71F8F600F40547 /* stoneFloor.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = stoneFloor.jpg; path = ../../../Downloads/stoneFloor.jpg; sourceTree = "<group>"; };
 		7ECF47D51E71F8FC00F40547 /* playerIconBackground.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = playerIconBackground.jpg; path = ../../../Downloads/playerIconBackground.jpg; sourceTree = "<group>"; };
+		7ECF47D71E72385400F40547 /* dryGround.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = dryGround.jpg; path = ../../../Downloads/dryGround.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +122,7 @@
 		1B400C2F1E6F1C7A00DAA5AA /* Textures */ = {
 			isa = PBXGroup;
 			children = (
+				7ECF47D71E72385400F40547 /* dryGround.jpg */,
 				7ECF47D31E71F8F600F40547 /* stoneFloor.jpg */,
 				1B400C2B1E6D768600DAA5AA /* crate.jpg */,
 				1B400C2D1E6D864100DAA5AA /* sphereTexture2.png */,
@@ -202,6 +205,7 @@
 				1B400C361E6F1C9A00DAA5AA /* grayBrickTexture.jpg in Resources */,
 				1B400BF01E6D1A1E00DAA5AA /* Assets.xcassets in Resources */,
 				1B400BF31E6D1A1E00DAA5AA /* LaunchScreen.storyboard in Resources */,
+				7ECF47D81E72385400F40547 /* dryGround.jpg in Resources */,
 				1B400BE61E6D1A1E00DAA5AA /* Shader.fsh in Resources */,
 				7ECF47D61E71F8FC00F40547 /* playerIconBackground.jpg in Resources */,
 				1B400C2E1E6D864100DAA5AA /* sphereTexture2.png in Resources */,
