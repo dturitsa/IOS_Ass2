@@ -5,16 +5,7 @@
 //  Created by Denis Turitsa on 2017-03-05.
 //  Copyright © 2017 Denis Turitsa. All rights reserved.
 //
-/*
- //default shader
-varying lowp vec4 colorVarying;
 
-void main()
-{
-    gl_FragColor = colorVarying;
-}
-*/
-//new shader:
 precision mediump float;
 
 varying vec3 eyeNormal;
@@ -30,6 +21,8 @@ uniform vec4 diffuseComponent;
 uniform float shininess;
 uniform vec4 specularComponent;
 uniform vec4 ambientComponent;
+uniform vec4 fogIntensity; //0 to 1
+uniform vec4 fogColor;
 
 void main()
 {
@@ -49,8 +42,12 @@ void main()
         specular = vec4(0.0, 0.0, 0.0, 1.0);
     }
     
-    //vec4 fog = vec4(0.5, 0.5, 0.5, 1.0);
-    
-    gl_FragColor = (ambient + diffuse + specular) * texture2D(texture, texCoordOut);
+    //vec4 fogColor = vec4(0.5, 0.5, 0.5, 1.0);
+    vec4 finalColor = (ambient + diffuse + specular) * texture2D(texture, texCoordOut);
+    vec4 fogDiff =  fogColor - finalColor;
+    fogDiff = fogDiff * fogIntensity;
+    finalColor = fogDiff + finalColor;
+    gl_FragColor = finalColor;
     gl_FragColor.a = 1.0;
+    
 }

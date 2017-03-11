@@ -33,8 +33,6 @@ typedef struct
 @property NSString* textureName;
 
 
-
-
 @end
 
 

@@ -23,7 +23,6 @@ enum
     UNIFORM_MODELVIEWPROJECTION_MATRIX,
     UNIFORM_NORMAL_MATRIX,
     UNIFORM_MODELVIEW_MATRIX,
-    /* more uniforms needed here... */
     UNIFORM_TEXTURE,
     UNIFORM_FLASHLIGHT_POSITION,
     UNIFORM_DIFFUSE_LIGHT_POSITION,
@@ -31,6 +30,8 @@ enum
     UNIFORM_AMBIENT_COMPONENT,
     UNIFORM_DIFFUSE_COMPONENT,
     UNIFORM_SPECULAR_COMPONENT,
+    UNIFORM_FOG_COLOR,
+    UNIFORM_FOG_INTENSITY,
     NUM_UNIFORMS
 };
 GLint uniforms[NUM_UNIFORMS];
@@ -60,6 +61,7 @@ GLint uniforms[NUM_UNIFORMS];
     float shininess;
     GLKVector4 specularComponent;
     GLKVector4 ambientComponent, ambientDay, ambientNight;
+    GLKVector4 fogColor, fogIntensity;
 
 
 }
@@ -177,9 +179,9 @@ CGPoint oldRotation;
 }
 - (IBAction)fogToggle:(UISwitch *)sender {
     if ([sender isOn]) {
-        
+        fogIntensity = GLKVector4Make(.6f, .6f, .6f, 1.0);
     }else{
-        
+        fogIntensity = GLKVector4Make(0, 0, 0, 0);
     }
 }
 - (IBAction)flashlightToggle:(UISwitch *)sender {
@@ -328,12 +330,18 @@ bool isDay = true;
     uniforms[UNIFORM_AMBIENT_COMPONENT] = glGetUniformLocation(_program, "ambientComponent");
     uniforms[UNIFORM_DIFFUSE_COMPONENT] = glGetUniformLocation(_program, "diffuseComponent");
     uniforms[UNIFORM_SPECULAR_COMPONENT] = glGetUniformLocation(_program, "specularComponent");
+    uniforms[UNIFORM_FOG_INTENSITY] = glGetUniformLocation(_program, "fogIntensity");
+    uniforms[UNIFORM_FOG_COLOR] = glGetUniformLocation(_program, "fogColor");
     
     // Set up lighting parameters
     flashlightPosition = GLKVector3Make(0.0, 0.0, 0.1f);
     diffuseLightPosition = GLKVector3Make(0.0, 1.0, 1.0);
     diffuseComponent = diffuseDay;
     shininess = 50.0;
+    
+    fogIntensity = GLKVector4Make(0, 0, 0, 1.0);
+    fogColor = GLKVector4Make(0.5f, 0.5f, 0.5f, 1);
+    
     
     ambientComponent = ambientDay;
     
@@ -548,13 +556,14 @@ bool displayMinimap = false;
     glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _modelViewProjectionMatrix.m);
     glUniformMatrix3fv(uniforms[UNIFORM_NORMAL_MATRIX], 1, 0, _normalMatrix.m);
     glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEW_MATRIX], 1, 0, _modelViewProjectionMatrix.m);
-    /* set lighting parameters... */
     glUniform3fv(uniforms[UNIFORM_FLASHLIGHT_POSITION], 1, flashlightPosition.v);
     glUniform3fv(uniforms[UNIFORM_DIFFUSE_LIGHT_POSITION], 1, diffuseLightPosition.v);
     glUniform4fv(uniforms[UNIFORM_DIFFUSE_COMPONENT], 1, diffuseComponent.v);
     glUniform1f(uniforms[UNIFORM_SHININESS], shininess);
     glUniform4fv(uniforms[UNIFORM_SPECULAR_COMPONENT], 1, specularComponent.v);
     glUniform4fv(uniforms[UNIFORM_AMBIENT_COMPONENT], 1, ambientComponent.v);
+    glUniform4fv(uniforms[UNIFORM_FOG_INTENSITY], 1, fogIntensity.v);
+    glUniform4fv(uniforms[UNIFORM_FOG_COLOR], 1, fogColor.v);
     
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, gameObject.modelHandle.textureHandle);
@@ -621,13 +630,14 @@ float moveSpeed = 0;
     glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _modelViewProjectionMatrix.m);
     glUniformMatrix3fv(uniforms[UNIFORM_NORMAL_MATRIX], 1, 0, _normalMatrix.m);
     glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEW_MATRIX], 1, 0, _modelViewProjectionMatrix.m);
-    /* set lighting parameters... */
     glUniform3fv(uniforms[UNIFORM_FLASHLIGHT_POSITION], 1, flashlightPosition.v);
     glUniform3fv(uniforms[UNIFORM_DIFFUSE_LIGHT_POSITION], 1, diffuseLightPosition.v);
     glUniform4fv(uniforms[UNIFORM_DIFFUSE_COMPONENT], 1, diffuseComponent.v);
     glUniform1f(uniforms[UNIFORM_SHININESS], shininess);
     glUniform4fv(uniforms[UNIFORM_SPECULAR_COMPONENT], 1, specularComponent.v);
     glUniform4fv(uniforms[UNIFORM_AMBIENT_COMPONENT], 1, ambientComponent.v);
+    glUniform4fv(uniforms[UNIFORM_FOG_COLOR], 1, fogColor.v);
+    glUniform4fv(uniforms[UNIFORM_FOG_INTENSITY], 1, fogIntensity.v);
     
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, gameObject.modelHandle.textureHandle);
@@ -640,7 +650,7 @@ float moveSpeed = 0;
  
 }
 
-
+//sets up the models and textures
 -(VertexInfo)setupVertices :(GLfloat*)posArray :(GLfloat*)texArray :(GLfloat*)normArray :(int)vertexNum :(NSString*) textureName
 {
     VertexInfo vertexInfoStruct;
@@ -689,7 +699,6 @@ float moveSpeed = 0;
 
     
     // Load in and set texture
-    /* use setupTexture to create crate texture */
     vertexInfoStruct.textureHandle = [self setupTexture:textureName];
     
     return vertexInfoStruct;
