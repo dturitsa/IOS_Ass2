@@ -9,8 +9,6 @@
 #import "GameViewController.h"
 #import <OpenGLES/ES2/glext.h>
 #import "GameObject.h"
-#include "ModelData.m"
-#include "ObjParser.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 #define VIEWPORT_WIDTH 720.0f
@@ -251,7 +249,8 @@ bool isDay = true;
     _player.position = GLKVector3Make(0.0f, 0.0f, 0.0f);
     _player.scale = GLKVector3Make(1.2f,1.2f,1.2f);
     _player.rotation = GLKVector3Make(0.0f,-1.5708f,0.0f);
-    _player.modelName = @"player";
+    _player.modelName = @"triangle";
+    _player.name = @"player";
     _player.textureName = @"playerIconBackground.jpg";
     
     //setup floor
@@ -259,7 +258,8 @@ bool isDay = true;
     [_gameObjectsToAdd addObject:floor];
     floor.position = GLKVector3Make(4.0f, -1.0f, -1);
     floor.scale = GLKVector3Make(9.0f,9.0f,9.0f);
-    floor.modelName = @"floor";
+    floor.modelName = @"triangulatedQuad";
+    floor.name = @"floor";
     floor.textureName = @"dryGround.jpg";
     
     //setup rotating cube
@@ -267,7 +267,8 @@ bool isDay = true;
     [_gameObjectsToAdd addObject:rotatingCube];
     rotatingCube.position = GLKVector3Make(0.0f, 0.5f, 8.0f);
     rotatingCube.scale = GLKVector3Make(.3f,.3f,.3f);
-    rotatingCube.modelName = @"crate";
+    rotatingCube.modelName = @"crateCube";
+    rotatingCube.name = @"crate";
     rotatingCube.textureName = @"crate.jpg";
     
     //setup maze walls
@@ -275,35 +276,35 @@ bool isDay = true;
     [_gameObjectsToAdd addObject:wall];
     wall.position = GLKVector3Make(-2.0f, 0, 0.0f);
     wall.scale = GLKVector3Make(1,1,5);
-    wall.modelName = @"wall";
+    wall.modelName = @"crateCube";
     wall.textureName = @"redBrickTexture.jpg";
     
     GameObject *wall1 = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:wall1];
     wall1.position = GLKVector3Make(2.0f, 0, 2.0f);
     wall1.scale = GLKVector3Make(1,1,4);
-    wall1.modelName = @"wall";
+    wall1.modelName = @"crateCube";
     wall1.textureName = @"brownBrickTexture2.jpg";
     
     GameObject *wall2 = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:wall2];
     wall2.position = GLKVector3Make(3.0f, 0.0f, -6.0f);
     wall2.scale = GLKVector3Make(6,1,1);
-    wall2.modelName = @"wall";
+    wall2.modelName = @"crateCube";
     wall2.textureName = @"crate.jpg";
     
     GameObject *wall3 = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:wall3];
     wall3.position = GLKVector3Make(4.05f, 0, -1.05f);
     wall3.scale = GLKVector3Make(3,1,1);
-    wall3.modelName = @"wall";
+    wall3.modelName = @"crateCube";
     wall3.textureName = @"colorBrickTexture.jpg";
     
     GameObject *wall4 = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:wall4];
     wall4.position = GLKVector3Make(9.5f, 0, -2.0f);
     wall4.scale = GLKVector3Make(1,1,4);
-    wall4.modelName = @"wall";
+    wall4.modelName = @"crateCube";
     wall4.textureName = @"brownBrickTexture2.jpg";
     
     
@@ -311,12 +312,9 @@ bool isDay = true;
     [_gameObjectsToAdd addObject:wall5];
     wall5.position = GLKVector3Make(5.0f, 0.0f, 5.0f);
     wall5.scale = GLKVector3Make(4,1,1);
-    wall5.modelName = @"wall";
+    wall5.modelName = @"crateCube";
     wall5.textureName = @"brownBrickTexture2.jpg";
 
-    ObjParser *p = [[ObjParser alloc] init];
-
-    [p parseFile];
     
     
 }
@@ -414,41 +412,6 @@ bool isDay = true;
     _gameObjects = nil;
 }
 
-
-//Associate gameobjects with models
-//this should only run once for each object
--(void)bindObject:(GameObject*)object
-{
-    
-    //for debugging
-    NSLog(@"Binding GL for: %@", object.modelName);
-    
-    //determine model based on what the object is
-    //if([object isKindOfClass:[GameObject class]])
-    int vertexNum;
-    if ([object.modelName isEqualToString:@"crate"])
-    {
-        vertexNum = sizeof(crate_v) / 12;
-        object.modelHandle = [self setupVertices :crate_v :crate_vt :crate_vn :vertexNum :object.textureName];
-    }
-    else if ([object.modelName isEqualToString:@"player"])
-    {
-        vertexNum = sizeof(playerIndicator_v) / 12;
-        object.modelHandle = [self setupVertices :playerIndicator_v :playerIndicator_vt :playerIndicator_vn :vertexNum :object.textureName];
-    }
-    else if ([object.modelName isEqualToString:@"wall"])
-    {
-        vertexNum = sizeof(cube_pos) / 12;
-        object.modelHandle = [self setupVertices :cube_pos :cube_tex :cube_norm :vertexNum :object.textureName];
-    }
-    else if ([object.modelName isEqualToString:@"floor"])
-    {
-        vertexNum = sizeof(background_v) / 12;
-        object.modelHandle = [self setupVertices :background_v :background_vt :background_vn :vertexNum :object.textureName];
-    }
-    
-}
-
 #pragma mark - GLKView and GLKViewController delegate methods
 
 - (void)update
@@ -457,8 +420,8 @@ bool isDay = true;
     
     for(id o in _gameObjectsToAdd)
     {
+        ((GameObject*)o).modelHandle = [self loadModel :((GameObject*)o).modelName :((GameObject*)o).textureName];
         [_gameObjects addObject:o];
-        [self bindObject:o];
     }
     [_gameObjectsToAdd removeAllObjects];
 
@@ -534,14 +497,14 @@ bool displayMinimap = false;
     
     
     //rotate the crate
-    if ([gameObject.modelName isEqualToString:@"crate"]){
+    if ([gameObject.name isEqualToString:@"crate"]){
         modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
        // _rotation += self.timeSinceLastUpdate * 0.3f;
     }
     
     
     //model rotation
-    if ([gameObject.modelName isEqualToString:@"player"])
+    if ([gameObject.name isEqualToString:@"player"])
     {
         modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, -xRotation, 0, 1,0);
     }
@@ -609,12 +572,12 @@ float moveSpeed = 0;
     GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(gameObject.position.x, gameObject.position.y, gameObject.position.z);
     
     //rotate the crate
-    if ([gameObject.modelName isEqualToString:@"crate"]){
+    if ([gameObject.name isEqualToString:@"crate"]){
         modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
         _rotation += self.timeSinceLastUpdate * 0.3f;
     }
     //don't render the player (player model used for minimap only
-    if ([gameObject.modelName isEqualToString:@"player"]){
+    if ([gameObject.name isEqualToString:@"player"]){
         return;
     }
 
@@ -654,7 +617,167 @@ float moveSpeed = 0;
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gameObject.modelHandle.vBuffer);
     glDrawArrays(GL_TRIANGLES, 0, gameObject.modelHandle.length);
     glBindVertexArrayOES(0);
+}
+/*
+Loads model vtnf arrays from the obj file, and sets up the vertex buffer, and uses the provided image for texture
+Parameters:
+ filename - string file name of the obj model - DON'T INCLUDE THE EXTENSION!(ie "crate" instead of "crate.obj")
+ textureName - string name of the texture image file - this one should have the extension included
+ */
+-(VertexInfo)loadModel :(NSString*) fileName :(NSString*) textureName
+{
+    NSString* fileRoot = [[NSBundle mainBundle]
+                          pathForResource:fileName ofType:@"obj"];
+    
+    NSString* fileContents =
+    [NSString stringWithContentsOfFile:fileRoot
+                              encoding:NSUTF8StringEncoding error:nil];
+    
+    // separate by new line
+    NSArray* allLinedStrings =
+    [fileContents componentsSeparatedByCharactersInSet:
+     [NSCharacterSet newlineCharacterSet]];
+    
+
+    int tLength = 0;
+    int vLength = 0;
+    int nLength = 0;
+    int fLength = 0;
  
+    //determine the length of the vtnf arrays
+    for (NSString* line in allLinedStrings) {
+        if (line.length > 1 && [line characterAtIndex:0] == 'v' && [line characterAtIndex:1] == 't') {
+            tLength+= 2;
+        }
+        else if (line.length > 1 && [line characterAtIndex:0] == 'v' && [line characterAtIndex:1] == 'n') {
+            nLength+= 3;
+        }
+        else if (line.length > 1 && [line characterAtIndex:0] == 'v' && [line characterAtIndex:1] == ' ') {
+            vLength+= 3;
+        }
+        else if (line.length > 1 && [line characterAtIndex:0] == 'f'){
+            
+            fLength+= 9;
+        }
+    }
+    float vArray[vLength];
+    float nArray[nLength];
+    float tArray[tLength];
+    int fArray[fLength];
+    int tCount = 0;
+    int vCount = 0;
+    int nCount = 0;
+    int fCount = 0;
+    int i = 0;
+    NSScanner *scanner;
+    
+    
+    
+    //populate the vtnf arrays with values from the obj file
+    for (NSString* line in allLinedStrings) {
+        scanner = [NSScanner scannerWithString:line];
+        
+        if (line.length > 1 && [line characterAtIndex:0] == 'v' && [line characterAtIndex:1] == 't') {
+            [scanner scanUpToString:@" " intoString:NULL];
+            
+            for(i = 0; i < 2; i++){
+                [scanner setScanLocation:[scanner scanLocation] + 1];
+                [scanner scanFloat:&tArray[tCount]];
+                tCount++;
+            }
+        }
+        else if (line.length > 1 && [line characterAtIndex:0] == 'v' && [line characterAtIndex:1] == 'n') {
+            [scanner scanUpToString:@" " intoString:NULL];
+            
+            for(i = 0; i < 3; i++){
+                [scanner setScanLocation:[scanner scanLocation] + 1];
+                [scanner scanFloat:&nArray[nCount]];
+                nCount++;
+            }
+        }
+        else if (line.length > 1 && [line characterAtIndex:0] == 'v' && [line characterAtIndex:1] == ' ') {
+            [scanner scanUpToString:@" " intoString:NULL];
+            
+            for(i = 0; i < 3; i++){
+                [scanner setScanLocation:[scanner scanLocation] + 1];
+                [scanner scanFloat:&vArray[vCount]];
+                vCount++;
+            }
+
+        }
+        else if (line.length > 1 && [line characterAtIndex:0] == 'f'){
+            [scanner scanUpToString:@" " intoString:NULL];
+            
+            for(i = 0; i <9; i++){
+                [scanner setScanLocation:[scanner scanLocation] + 1];
+                [scanner scanInt:&fArray[fCount]];
+                fCount++;
+            }
+        }
+    }
+    //build the combined vnt array based on the vertices specified in the fArray
+    float mixedArray[(fLength/3)*8];
+    int mCount = 0;
+    vCount = 0;
+    tCount = 0;
+    nCount = 0;
+    tCount = 0;
+    int j = 0;
+    for(i=0; i < fLength; i++){
+        if(i%3 == 0){
+            mixedArray[mCount] = vArray[(fArray[i]-1)*3];
+            mCount++;
+            mixedArray[mCount] = vArray[(fArray[i]-1)*3 + 1];
+            mCount++;
+            mixedArray[mCount] = vArray[(fArray[i]-1)*3 + 2];
+            mCount++;
+        }
+        else if(i%3 == 2){
+            mixedArray[mCount] = nArray[(fArray[i]-1)*3];
+            mCount++;
+            mixedArray[mCount] = nArray[(fArray[i]-1)*3 + 1];
+            mCount++;
+            mixedArray[mCount] = nArray[(fArray[i]-1)*3 + 2];
+            mCount++;
+        }
+        else if(i%3 == 1){
+            mixedArray[mCount] = tArray[(fArray[i]-1)*2];
+            mCount++;
+            mixedArray[mCount] = tArray[(fArray[i]-1)*2 + 1];
+            mCount++;
+        }
+    }
+    
+    VertexInfo vertexInfoStruct;
+    vertexInfoStruct.length = fLength/3;
+    //NSLog(@"%u", vertexInfoStruct.length);
+    
+    glGenVertexArraysOES(1, &vertexInfoStruct.vArray);
+    glBindVertexArrayOES(vertexInfoStruct.vArray);
+    
+    glGenBuffers(1, &vertexInfoStruct.vBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexInfoStruct.vBuffer);
+
+    //load array into buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(mixedArray), mixedArray, GL_STATIC_DRAW);
+    
+    glEnableVertexAttribArray(GLKVertexAttribPosition);
+    glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, 32, BUFFER_OFFSET(0));
+    
+    glEnableVertexAttribArray(GLKVertexAttribTexCoord0);
+    glVertexAttribPointer(GLKVertexAttribTexCoord0, 2, GL_FLOAT, GL_FALSE, 32, BUFFER_OFFSET(12));
+    
+    glEnableVertexAttribArray(GLKVertexAttribNormal);
+    glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 32, BUFFER_OFFSET(20));
+    
+    
+    glBindVertexArrayOES(0);
+    
+    // Load in and set texture
+    vertexInfoStruct.textureHandle = [self setupTexture:textureName];
+    
+    return vertexInfoStruct;
+    
 }
 
 //sets up the models and textures
@@ -704,7 +827,6 @@ float moveSpeed = 0;
     
     glBindVertexArrayOES(0);
 
-    
     // Load in and set texture
     vertexInfoStruct.textureHandle = [self setupTexture:textureName];
     

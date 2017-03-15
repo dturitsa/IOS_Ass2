@@ -28,6 +28,7 @@ typedef struct
 @property GLKVector3 scale;
 
 @property NSString* modelName;
+@property NSString* name;
 @property VertexInfo modelHandle;
 
 @property NSString* textureName;
