@@ -27,6 +27,10 @@
 		1B400C371E6F1C9A00DAA5AA /* redBrickTexture.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 1B400C331E6F1C9A00DAA5AA /* redBrickTexture.jpg */; };
 		1B8DB7F61E73CB7F006C1CC6 /* dryGround.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 1B8DB7F51E73CB7F006C1CC6 /* dryGround.jpg */; };
 		1B8DB7F81E73CBE9006C1CC6 /* playerIconBackground.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 1B8DB7F71E73CBE9006C1CC6 /* playerIconBackground.jpg */; };
+		7E365F681E78C7BA001FDC80 /* ObjParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7E365F661E78C7BA001FDC80 /* ObjParser.cpp */; };
+		7E365F6A1E78C80B001FDC80 /* Mix.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7E365F691E78C80B001FDC80 /* Mix.mm */; };
+		7E365F6D1E78D4DB001FDC80 /* ObjParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E365F6C1E78D4DB001FDC80 /* ObjParser.m */; };
+		7E365F711E78EAA0001FDC80 /* cubeTest3.obj in Resources */ = {isa = PBXBuildFile; fileRef = 7E365F701E78EAA0001FDC80 /* cubeTest3.obj */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +60,12 @@
 		1B400C331E6F1C9A00DAA5AA /* redBrickTexture.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = redBrickTexture.jpg; sourceTree = "<group>"; };
 		1B8DB7F51E73CB7F006C1CC6 /* dryGround.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = dryGround.jpg; sourceTree = "<group>"; };
 		1B8DB7F71E73CBE9006C1CC6 /* playerIconBackground.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = playerIconBackground.jpg; sourceTree = "<group>"; };
+		7E365F661E78C7BA001FDC80 /* ObjParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ObjParser.cpp; sourceTree = "<group>"; };
+		7E365F671E78C7BA001FDC80 /* ObjParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjParser.h; sourceTree = "<group>"; };
+		7E365F691E78C80B001FDC80 /* Mix.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Mix.mm; sourceTree = "<group>"; };
+		7E365F6B1E78C81F001FDC80 /* Mix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Mix.h; sourceTree = "<group>"; };
+		7E365F6C1E78D4DB001FDC80 /* ObjParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjParser.m; sourceTree = "<group>"; };
+		7E365F701E78EAA0001FDC80 /* cubeTest3.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cubeTest3.obj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +103,12 @@
 				1B400BE21E6D1A1E00DAA5AA /* AppDelegate.h */,
 				1B400BE31E6D1A1E00DAA5AA /* AppDelegate.m */,
 				1B400BE51E6D1A1E00DAA5AA /* Shader.fsh */,
+				7E365F701E78EAA0001FDC80 /* cubeTest3.obj */,
+				7E365F661E78C7BA001FDC80 /* ObjParser.cpp */,
+				7E365F691E78C80B001FDC80 /* Mix.mm */,
+				7E365F6B1E78C81F001FDC80 /* Mix.h */,
+				7E365F6C1E78D4DB001FDC80 /* ObjParser.m */,
+				7E365F671E78C7BA001FDC80 /* ObjParser.h */,
 				1B400BE71E6D1A1E00DAA5AA /* Shader.vsh */,
 				1B400BE91E6D1A1E00DAA5AA /* GameViewController.h */,
 				1B400BEA1E6D1A1E00DAA5AA /* GameViewController.m */,
@@ -200,6 +216,7 @@
 				1B8DB7F61E73CB7F006C1CC6 /* dryGround.jpg in Resources */,
 				1B400C281E6D592E00DAA5AA /* Downloads in Resources */,
 				1B400C361E6F1C9A00DAA5AA /* grayBrickTexture.jpg in Resources */,
+				7E365F711E78EAA0001FDC80 /* cubeTest3.obj in Resources */,
 				1B400BF01E6D1A1E00DAA5AA /* Assets.xcassets in Resources */,
 				1B400BF31E6D1A1E00DAA5AA /* LaunchScreen.storyboard in Resources */,
 				1B400BE61E6D1A1E00DAA5AA /* Shader.fsh in Resources */,
@@ -219,8 +236,11 @@
 			files = (
 				1B400BFB1E6D1BE000DAA5AA /* GameObject.m in Sources */,
 				1B400BE41E6D1A1E00DAA5AA /* AppDelegate.m in Sources */,
+				7E365F6A1E78C80B001FDC80 /* Mix.mm in Sources */,
+				7E365F681E78C7BA001FDC80 /* ObjParser.cpp in Sources */,
 				1B400BEB1E6D1A1E00DAA5AA /* GameViewController.m in Sources */,
 				1B400BE11E6D1A1E00DAA5AA /* main.m in Sources */,
+				7E365F6D1E78D4DB001FDC80 /* ObjParser.m in Sources */,
 				1B400BFE1E6D1DAF00DAA5AA /* ModelData.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

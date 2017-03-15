@@ -10,6 +10,7 @@
 #import <OpenGLES/ES2/glext.h>
 #import "GameObject.h"
 #include "ModelData.m"
+#include "ObjParser.h"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 #define VIEWPORT_WIDTH 720.0f
@@ -62,6 +63,8 @@ GLint uniforms[NUM_UNIFORMS];
     GLKVector4 specularComponent;
     GLKVector4 ambientComponent, ambientDay, ambientNight;
     GLKVector4 fogColor, fogIntensity;
+    
+   // Mix *parserObj;
 
 
 }
@@ -311,7 +314,11 @@ bool isDay = true;
     wall5.modelName = @"wall";
     wall5.textureName = @"brownBrickTexture2.jpg";
 
+    ObjParser *p = [[ObjParser alloc] init];
 
+    [p parseFile];
+    
+    
 }
 - (void)setupGL
 {
