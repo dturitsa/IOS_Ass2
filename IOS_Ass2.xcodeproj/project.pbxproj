@@ -30,6 +30,15 @@
 		7EC6980D1E79DEA800C9AFA7 /* crateCube.obj in Resources */ = {isa = PBXBuildFile; fileRef = 7EC6980C1E79DEA800C9AFA7 /* crateCube.obj */; };
 		7EC698101E79E44E00C9AFA7 /* triangle.obj in Resources */ = {isa = PBXBuildFile; fileRef = 7EC6980F1E79E44E00C9AFA7 /* triangle.obj */; };
 		7EC698121E79E45A00C9AFA7 /* triangulatedQuad.obj in Resources */ = {isa = PBXBuildFile; fileRef = 7EC698111E79E45A00C9AFA7 /* triangulatedQuad.obj */; };
+		7EDA97151E7B47D80000F78D /* Player_White.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EDA97141E7B47D80000F78D /* Player_White.png */; };
+		7EDA97171E7B47DD0000F78D /* player.obj in Resources */ = {isa = PBXBuildFile; fileRef = 7EDA97161E7B47DD0000F78D /* player.obj */; };
+		7EDA97191E7B50940000F78D /* PlayerWHiteSmartProj.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EDA97181E7B50940000F78D /* PlayerWHiteSmartProj.png */; };
+		7EDA971B1E7B50990000F78D /* playerSmartProj.obj in Resources */ = {isa = PBXBuildFile; fileRef = 7EDA971A1E7B50990000F78D /* playerSmartProj.obj */; };
+		7EDA971D1E7B685C0000F78D /* numberedCube.obj in Resources */ = {isa = PBXBuildFile; fileRef = 7EDA971C1E7B685C0000F78D /* numberedCube.obj */; };
+		7EDA971F1E7B68670000F78D /* CubeNumbered.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EDA971E1E7B68670000F78D /* CubeNumbered.png */; };
+		7EDA97211E7B6ADE0000F78D /* CubeNumbered2.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EDA97201E7B6ADE0000F78D /* CubeNumbered2.png */; };
+		7EDA97231E7B7AC80000F78D /* CubeNumbered3.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EDA97221E7B7AC80000F78D /* CubeNumbered3.png */; };
+		7EDA97251E7B7BBD0000F78D /* CubeNumbered4.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EDA97241E7B7BBD0000F78D /* CubeNumbered4.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,6 +70,15 @@
 		7EC6980C1E79DEA800C9AFA7 /* crateCube.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = crateCube.obj; sourceTree = "<group>"; };
 		7EC6980F1E79E44E00C9AFA7 /* triangle.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = triangle.obj; sourceTree = "<group>"; };
 		7EC698111E79E45A00C9AFA7 /* triangulatedQuad.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = triangulatedQuad.obj; sourceTree = "<group>"; };
+		7EDA97141E7B47D80000F78D /* Player_White.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Player_White.png; sourceTree = "<group>"; };
+		7EDA97161E7B47DD0000F78D /* player.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = player.obj; sourceTree = "<group>"; };
+		7EDA97181E7B50940000F78D /* PlayerWHiteSmartProj.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = PlayerWHiteSmartProj.png; sourceTree = "<group>"; };
+		7EDA971A1E7B50990000F78D /* playerSmartProj.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = playerSmartProj.obj; sourceTree = "<group>"; };
+		7EDA971C1E7B685C0000F78D /* numberedCube.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = numberedCube.obj; sourceTree = "<group>"; };
+		7EDA971E1E7B68670000F78D /* CubeNumbered.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CubeNumbered.png; sourceTree = "<group>"; };
+		7EDA97201E7B6ADE0000F78D /* CubeNumbered2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CubeNumbered2.png; sourceTree = "<group>"; };
+		7EDA97221E7B7AC80000F78D /* CubeNumbered3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CubeNumbered3.png; sourceTree = "<group>"; };
+		7EDA97241E7B7BBD0000F78D /* CubeNumbered4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CubeNumbered4.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +142,12 @@
 		1B400C2F1E6F1C7A00DAA5AA /* Textures */ = {
 			isa = PBXGroup;
 			children = (
+				7EDA97201E7B6ADE0000F78D /* CubeNumbered2.png */,
+				7EDA97241E7B7BBD0000F78D /* CubeNumbered4.png */,
+				7EDA97221E7B7AC80000F78D /* CubeNumbered3.png */,
+				7EDA971E1E7B68670000F78D /* CubeNumbered.png */,
+				7EDA97181E7B50940000F78D /* PlayerWHiteSmartProj.png */,
+				7EDA97141E7B47D80000F78D /* Player_White.png */,
 				1B8DB7F51E73CB7F006C1CC6 /* dryGround.jpg */,
 				1B400C2B1E6D768600DAA5AA /* crate.jpg */,
 				1B400C2D1E6D864100DAA5AA /* sphereTexture2.png */,
@@ -140,6 +164,9 @@
 		7EC6980E1E79DF6200C9AFA7 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				7EDA971C1E7B685C0000F78D /* numberedCube.obj */,
+				7EDA971A1E7B50990000F78D /* playerSmartProj.obj */,
+				7EDA97161E7B47DD0000F78D /* player.obj */,
 				7E365F701E78EAA0001FDC80 /* cubeTest3.obj */,
 				7EC6980C1E79DEA800C9AFA7 /* crateCube.obj */,
 				7EC6980F1E79E44E00C9AFA7 /* triangle.obj */,
@@ -213,12 +240,21 @@
 				1B400C351E6F1C9A00DAA5AA /* colorBrickTexture.jpg in Resources */,
 				1B400C341E6F1C9A00DAA5AA /* brownBrickTexture2.jpg in Resources */,
 				1B8DB7F61E73CB7F006C1CC6 /* dryGround.jpg in Resources */,
+				7EDA97171E7B47DD0000F78D /* player.obj in Resources */,
+				7EDA971B1E7B50990000F78D /* playerSmartProj.obj in Resources */,
 				1B400C281E6D592E00DAA5AA /* Downloads in Resources */,
+				7EDA97231E7B7AC80000F78D /* CubeNumbered3.png in Resources */,
+				7EDA97211E7B6ADE0000F78D /* CubeNumbered2.png in Resources */,
 				1B400C361E6F1C9A00DAA5AA /* grayBrickTexture.jpg in Resources */,
+				7EDA971D1E7B685C0000F78D /* numberedCube.obj in Resources */,
 				7E365F711E78EAA0001FDC80 /* cubeTest3.obj in Resources */,
 				1B400BF01E6D1A1E00DAA5AA /* Assets.xcassets in Resources */,
+				7EDA971F1E7B68670000F78D /* CubeNumbered.png in Resources */,
 				1B400BF31E6D1A1E00DAA5AA /* LaunchScreen.storyboard in Resources */,
+				7EDA97251E7B7BBD0000F78D /* CubeNumbered4.png in Resources */,
 				7EC698101E79E44E00C9AFA7 /* triangle.obj in Resources */,
+				7EDA97191E7B50940000F78D /* PlayerWHiteSmartProj.png in Resources */,
+				7EDA97151E7B47D80000F78D /* Player_White.png in Resources */,
 				1B400BE61E6D1A1E00DAA5AA /* Shader.fsh in Resources */,
 				1B8DB7F81E73CBE9006C1CC6 /* playerIconBackground.jpg in Resources */,
 				7EC6980D1E79DEA800C9AFA7 /* crateCube.obj in Resources */,

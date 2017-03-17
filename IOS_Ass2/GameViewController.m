@@ -263,13 +263,13 @@ bool isDay = true;
     floor.textureName = @"dryGround.jpg";
     
     //setup rotating cube
-    GameObject *rotatingCube = [[GameObject alloc] init];
-    [_gameObjectsToAdd addObject:rotatingCube];
-    rotatingCube.position = GLKVector3Make(0.0f, 0.5f, 8.0f);
-    rotatingCube.scale = GLKVector3Make(.3f,.3f,.3f);
-    rotatingCube.modelName = @"crateCube";
-    rotatingCube.name = @"crate";
-    rotatingCube.textureName = @"crate.jpg";
+    GameObject *enemy = [[GameObject alloc] init];
+    [_gameObjectsToAdd addObject:enemy];
+    enemy.position = GLKVector3Make(0.0f, 0.5f, -2.0f);
+    enemy.scale = GLKVector3Make(.3f,.3f,.3f);
+    enemy.modelName = @"player";
+    enemy.name = @"enemy";
+    enemy.textureName = @"Player_White.png";
     
     //setup maze walls
     GameObject *wall = [[GameObject alloc] init];
@@ -497,7 +497,7 @@ bool displayMinimap = false;
     
     
     //rotate the crate
-    if ([gameObject.name isEqualToString:@"crate"]){
+    if ([gameObject.name isEqualToString:@"enemy"]){
         modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
        // _rotation += self.timeSinceLastUpdate * 0.3f;
     }
@@ -571,11 +571,11 @@ float moveSpeed = 0;
     //set model postion
     GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(gameObject.position.x, gameObject.position.y, gameObject.position.z);
     
-    //rotate the crate
-    if ([gameObject.name isEqualToString:@"crate"]){
-        modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
-        _rotation += self.timeSinceLastUpdate * 0.3f;
-    }
+    //rotate the enemy (for debuggling
+//    if ([gameObject.name isEqualToString:@"enemy"]){
+//        modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
+//        _rotation += self.timeSinceLastUpdate * 0.3f;
+//    }
     //don't render the player (player model used for minimap only
     if ([gameObject.name isEqualToString:@"player"]){
         return;
@@ -722,7 +722,6 @@ Parameters:
     tCount = 0;
     nCount = 0;
     tCount = 0;
-    int j = 0;
     for(i=0; i < fLength; i++){
         if(i%3 == 0){
             mixedArray[mCount] = vArray[(fArray[i]-1)*3];
@@ -743,7 +742,7 @@ Parameters:
         else if(i%3 == 1){
             mixedArray[mCount] = tArray[(fArray[i]-1)*2];
             mCount++;
-            mixedArray[mCount] = tArray[(fArray[i]-1)*2 + 1];
+            mixedArray[mCount] = 1-tArray[(fArray[i]-1)*2 + 1];
             mCount++;
         }
     }
