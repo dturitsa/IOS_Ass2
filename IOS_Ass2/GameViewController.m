@@ -198,9 +198,28 @@ bool isDay = true;
 //handle doubletaps
 - (void)handleTapGesture:(UITapGestureRecognizer *)sender {
     if (sender.state == UIGestureRecognizerStateRecognized) {
-        xMovement = 0;
-        zMovement = -10.0f;
-        xRotation = 0;
+        //  xMovement = 0;
+        //   zMovement = -10.0f;
+        //   xRotation = 0;
+        
+        CGPoint location = [sender locationInView:sender.view];
+        CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width * [[UIScreen mainScreen] scale];
+        CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height * [[UIScreen mainScreen] scale];
+        
+        //Get the colour of the pixel at the touched point
+        // CGPoint location = ccp((point.x - CGRectGetMinX(boundingBox)) * CC_CONTENT_SCALE_FACTOR(),
+        //                    (point.y - CGRectGetMinY(boundingBox)) * CC_CONTENT_SCALE_FACTOR());
+        GLint tapX = (GLint)location.x * [[UIScreen mainScreen] scale];
+        GLint tapY = (GLint)location.y * [[UIScreen mainScreen] scale];
+        
+        UInt8 data[4];
+        glReadPixels(tapX,
+                     screenHeight - tapY,
+                     1, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        // NSLog(@"touched color: %u, %u, %u", data[0], data[1], data[2]);
+        if(data[0] > 100 && data[1] > 100 && data[2] > 100){
+            NSLog(@"HEY! don't touch me!");
+        }
     }
 }
 
