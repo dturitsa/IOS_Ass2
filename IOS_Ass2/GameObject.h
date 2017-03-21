@@ -33,6 +33,12 @@ typedef struct
 
 @property NSString* textureName;
 
+//collision detection
+@property float length;
+@property float width;
+
+-(bool)checkCollisionBetweenObject:(GameObject *)one and:(GameObject *)two; //MICHAEL'S Collision function declaration
+-(void)onCollision:(GameObject*)otherObject;
 
 @end
 

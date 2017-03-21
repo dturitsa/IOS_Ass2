@@ -231,6 +231,13 @@ bool isDay = true;
 - (BOOL)prefersStatusBarHidden {
     return YES;
 }
+
+float enemyXPosition = 0.0f;
+float enemyYPosition = 0.0f;
+float enemyZPosition = 0.0f;
+float enemyMoveSpeed = -0.1f;
+bool enemyMove = true;
+
 - (void)setupGame
 {
     NSLog(@"Starting game...");
@@ -252,6 +259,8 @@ bool isDay = true;
     _player.modelName = @"triangle";
     _player.name = @"player";
     _player.textureName = @"playerIconBackground.jpg";
+    _player.length = 0.0f;
+    _player.width = 0.0f;
     
     //setup floor
     GameObject *floor = [[GameObject alloc] init];
@@ -259,17 +268,21 @@ bool isDay = true;
     floor.position = GLKVector3Make(4.0f, -1.0f, -1);
     floor.scale = GLKVector3Make(9.0f,9.0f,9.0f);
     floor.modelName = @"triangulatedQuad";
-    floor.name = @"floor";
     floor.textureName = @"dryGround.jpg";
+    floor.length = 0;
+    floor.width = 0;
+    floor.name = @"floor";
     
-    //setup rotating cube
+    //setup enemy
     GameObject *enemy = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:enemy];
-    enemy.position = GLKVector3Make(0.0f, 0.5f, -2.0f);
+    enemy.position = GLKVector3Make(enemyXPosition, enemyYPosition, enemyZPosition);
     enemy.scale = GLKVector3Make(.3f,.3f,.3f);
     enemy.modelName = @"player";
     enemy.name = @"enemy";
     enemy.textureName = @"Player_White.png";
+    enemy.length = 1.0f;
+    enemy.width = 1.0f;
     
     //setup maze walls
     GameObject *wall = [[GameObject alloc] init];
@@ -278,6 +291,9 @@ bool isDay = true;
     wall.scale = GLKVector3Make(1,1,5);
     wall.modelName = @"crateCube";
     wall.textureName = @"redBrickTexture.jpg";
+    wall.length = 2.0f * 1;
+    wall.width = 2.0f * 5;
+    wall.name = @"wall";
     
     GameObject *wall1 = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:wall1];
@@ -285,6 +301,9 @@ bool isDay = true;
     wall1.scale = GLKVector3Make(1,1,4);
     wall1.modelName = @"crateCube";
     wall1.textureName = @"brownBrickTexture2.jpg";
+//    wall1.length = 2.0f;
+//    wall1.width = 2.0f;
+//    wall1.name = @"wall1";
     
     GameObject *wall2 = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:wall2];
@@ -292,6 +311,9 @@ bool isDay = true;
     wall2.scale = GLKVector3Make(6,1,1);
     wall2.modelName = @"crateCube";
     wall2.textureName = @"crate.jpg";
+//    wall2.length = 2.0f * 6;
+//    wall2.width = 2.0f * 1;
+//    wall2.name = @"wall2";
     
     GameObject *wall3 = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:wall3];
@@ -299,6 +321,9 @@ bool isDay = true;
     wall3.scale = GLKVector3Make(3,1,1);
     wall3.modelName = @"crateCube";
     wall3.textureName = @"colorBrickTexture.jpg";
+//    wall3.length = 2.0f * 3;
+//    wall3.width = 2.0f * 1;
+//    wall3.name = @"wall3";
     
     GameObject *wall4 = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:wall4];
@@ -306,7 +331,9 @@ bool isDay = true;
     wall4.scale = GLKVector3Make(1,1,4);
     wall4.modelName = @"crateCube";
     wall4.textureName = @"brownBrickTexture2.jpg";
-    
+//    wall4.length = 2.0f * 1;
+//    wall4.width = 2.0f * 4;
+//    wall4.name = @"wall4";
     
     GameObject *wall5 = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:wall5];
@@ -314,8 +341,30 @@ bool isDay = true;
     wall5.scale = GLKVector3Make(4,1,1);
     wall5.modelName = @"crateCube";
     wall5.textureName = @"brownBrickTexture2.jpg";
-
+//    wall5.length = 2.0f * 4;
+//    wall5.width = 2.0f * 1;
+//    wall5.name = @"wall5";
     
+    // Create two walls just for testing collisions
+//    GameObject *wall6 = [[GameObject alloc] init];
+//    [_gameObjectsToAdd addObject:wall6];
+//    wall6.position = GLKVector3Make(-2.1f, 0.0f, 5.5f);
+//    wall6.scale = GLKVector3Make(2,1,1);
+//    wall6.modelName = @"crateCube";
+//    wall6.textureName = @"colorBrickTexture.jpg";
+//    wall6.length = 2.0f * 2;
+//    wall6.width = 2.0f;
+//    wall6.name = @"wall6";
+//    
+//    GameObject *wall7 = [[GameObject alloc] init];
+//    [_gameObjectsToAdd addObject:wall7];
+//    wall7.position = GLKVector3Make(1.0f, 0.0f, 5.5f);
+//    wall7.scale = GLKVector3Make(1,1,1);
+//    wall7.modelName = @"crateCube";
+//    wall7.textureName = @"crate.jpg";
+//    wall7.length = 2.0f;
+//    wall7.width = 2.0f;
+//    wall7.name = @"wall7";
     
 }
 - (void)setupGL
@@ -412,12 +461,34 @@ bool isDay = true;
     _gameObjects = nil;
 }
 
+//Michael
+//Physics collision detection
+//Each GameObject is a square with x,y position, length and width
+-(bool)checkCollisionBetweenObject:(GameObject *)one and:(GameObject *)two
+{
+    //    NSLog(@"-------------------------------------------------------------------------------------------------------");
+    //    NSLog(@"Checking Collisiosn Between: %@ and %@", one.name, two.name);
+    //    NSLog(@"One.Position: %f,%f One.Length: %f One.Width: %f", one.position.x, one.position.z, one.length, one.width);
+    //    NSLog(@"Two.Position: %f,%f Two.Length: %f Two.Width: %f", two.position.x, two.position.z, two.length, two.width);
+    //    NSLog(@"-------------------------------------------------------------------------------------------------------");
+    
+    if (one.length == 0 || one.width == 0 || two.length == 0 || two.width == 0)
+        return false;
+    // check x-axis collision
+    bool collisionX = one.position.x + one.length/2 >= two.position.x - two.length/2 && two.position.x + two.length/2 >= one.position.x - one.length/2;
+    
+    // check y-axis collision
+    bool collisionY = one.position.z + one.width/2 >= two.position.z - two.width/2 && two.position.z + two.width/2 >= one.position.z - one.width/2;
+    
+    // collision occurs only if on both axes
+    return collisionX && collisionY;
+    
+}
+
 #pragma mark - GLKView and GLKViewController delegate methods
 
 - (void)update
 {
-
-    
     for(id o in _gameObjectsToAdd)
     {
         ((GameObject*)o).modelHandle = [self loadModel :((GameObject*)o).modelName :((GameObject*)o).textureName];
@@ -425,6 +496,24 @@ bool isDay = true;
     }
     [_gameObjectsToAdd removeAllObjects];
 
+    //check for GameObject collisions
+    //loop through all gameobjects in scene
+    //check if any of those two objects are colliding AND they are both solid
+    //if they are, then return collision!
+    
+    for (int i=0; i <_gameObjects.count ; i++)
+    {
+        for (int j=0; j < _gameObjects.count ; j++)
+        {
+            if (_gameObjects[i] != _gameObjects[j] && [self checkCollisionBetweenObject:_gameObjects[i] and:_gameObjects[j]])
+            {
+                NSLog(@"Collision Detected Between: %@ and %@", ((GameObject *)_gameObjects[i]).name,((GameObject *)_gameObjects[j]).name);
+                //call oncollide function for first object only
+                [(GameObject *)_gameObjects[i] onCollision:_gameObjects[j]];
+            }
+        }
+    }
+    
 }
 
 bool displayMinimap = false;
@@ -433,7 +522,6 @@ bool displayMinimap = false;
     //set screen size
     CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width * [[UIScreen mainScreen] scale];
     CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height * [[UIScreen mainScreen] scale];
-    
     
     //1st viewport (main gameview)
     //glScissor(0, screenHeight / 2, screenWidth, screenHeight/2);
@@ -460,13 +548,12 @@ bool displayMinimap = false;
         
         for(id o in _gameObjects)
         {
-            [self renderObject2:(GameObject*)o];
+            [self renderMiniMap:(GameObject*)o];
         }
     }
-
 }
 
--(void)renderObject2:(GameObject*)gameObject{
+-(void)renderMiniMap:(GameObject*)gameObject{
     
     glBindVertexArrayOES(gameObject.modelHandle.vArray);
     glUseProgram(_program);
@@ -483,9 +570,6 @@ bool displayMinimap = false;
         GLKMatrix4 baseModelViewMatrix2 = GLKMatrix4MakeTranslation(-xMovement, zMovement, 0);
         baseModelViewMatrix = GLKMatrix4Multiply(baseModelViewMatrix, baseModelViewMatrix2);
     }
-
-    
-    
     
     //baseModelViewMatrix = GLKMatrix4Rotate(baseModelViewMatrix, 1.5708, 1.0f, 0.0f, 0.0f);
     baseModelViewMatrix = GLKMatrix4Rotate(baseModelViewMatrix, 1.5708f, 1.0f, 0.0f, 0.0f);
@@ -495,13 +579,11 @@ bool displayMinimap = false;
     //set model postion
     GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(gameObject.position.x, gameObject.position.y, gameObject.position.z);
     
-    
-    //rotate the crate
+    //rotate the enemy
     if ([gameObject.name isEqualToString:@"enemy"]){
         modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
-       // _rotation += self.timeSinceLastUpdate * 0.3f;
+//        _rotation += self.timeSinceLastUpdate * 0.3f;
     }
-    
     
     //model rotation
     if ([gameObject.name isEqualToString:@"player"])
@@ -571,17 +653,24 @@ float moveSpeed = 0;
     //set model postion
     GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(gameObject.position.x, gameObject.position.y, gameObject.position.z);
     
-    //rotate the enemy (for debuggling
-//    if ([gameObject.name isEqualToString:@"enemy"]){
+    //move and rotate the enemy
+    if ([gameObject.name isEqualToString:@"enemy"] && enemyMove){
+        
+        modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, enemyXPosition, enemyYPosition, enemyZPosition);
+        enemyXPosition += self.timeSinceLastUpdate * enemyMoveSpeed;
+        gameObject.position = GLKVector3Make(enemyXPosition, enemyYPosition, enemyZPosition);
+        
+//        NSLog(@"Enemy Position: %f, %f", gameObject.position.x, gameObject.position.z);
+        
 //        modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
 //        _rotation += self.timeSinceLastUpdate * 0.3f;
-//    }
+    }
+    
     //don't render the player (player model used for minimap only
     if ([gameObject.name isEqualToString:@"player"]){
         return;
     }
 
-    
     //model rotation
     modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, gameObject.rotation.x+gameObject.modelRotation.x, 1, 0,0);
     modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, gameObject.rotation.y+gameObject.modelRotation.y, 0, 1,0);
@@ -594,7 +683,6 @@ float moveSpeed = 0;
     
     _normalMatrix = GLKMatrix3InvertAndTranspose(GLKMatrix4GetMatrix3(modelViewMatrix), NULL);
     _modelViewProjectionMatrix = GLKMatrix4Multiply(projectionMatrix, modelViewMatrix);
-
     
     // Set up uniforms
     glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _modelViewProjectionMatrix.m);

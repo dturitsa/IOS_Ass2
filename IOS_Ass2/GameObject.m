@@ -21,4 +21,9 @@
 
 @implementation GameObject
 
+-(void)onCollision:(GameObject*)otherObject
+{
+    //    NSLog(@"Something Hit an Object!");
+}
+
 @end

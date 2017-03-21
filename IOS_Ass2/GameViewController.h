@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 #import <GLKit/GLKit.h>
-#import "Mix.h"
 
 @interface GameViewController : GLKViewController
 
