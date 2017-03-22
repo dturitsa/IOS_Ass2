@@ -147,16 +147,19 @@ GLint uniforms[NUM_UNIFORMS];
 CGPoint originalLocation;
 float xMovement, zMovement;
 float xRotation;
+float yRotation;
 CGPoint oldRotation;
 
 //drag-rotate detection
 -(void)dragging:(UIPanGestureRecognizer *)gesture
 {
-
-     if(gesture.state == UIGestureRecognizerStateBegan)
-        {
-            oldRotation = [gesture locationInView:gesture.view];
-        }
+    
+    if(gesture.state == UIGestureRecognizerStateBegan)
+    {
+        oldRotation = [gesture locationInView:gesture.view];
+    }
+    
+    if (gesture.numberOfTouches == 1) {
     CGPoint newCoord = [gesture locationInView:gesture.view];
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     xRotation += newCoord.x / screenRect.size.width - oldRotation.x / screenRect.size.width;
@@ -165,13 +168,25 @@ CGPoint oldRotation;
     //NSLog(@"movespeed: %f", moveSpeed);
     moveSpeed *= .05f;
     oldRotation = [gesture locationInView:gesture.view];
+    }
     
     if(gesture.state == UIGestureRecognizerStateEnded)
     {
         moveSpeed = 0;
     }
     
+    if (gesture.numberOfTouches > 1 && !enemyMove && isTouchingEnemy) {
+        CGPoint newCoord = [gesture locationInView:gesture.view];
+        CGRect screenRect = [[UIScreen mainScreen] bounds];
+        enemyRotation = (newCoord.x / screenRect.size.width - oldRotation.x / screenRect.size.width) * 5;
+        enemyYOffset += -(newCoord.y / screenRect.size.height - oldRotation.y / screenRect.size.height)/4.0f * self.timeSinceLastUpdate;
+    }
+    
+//    NSLog (@"Number of touches: %lu", (unsigned long)gesture.numberOfTouches);
+//    NSLog (@"Position X: %f, Y: %f", newCoord.x/100, newCoord.y/100);
+//    NSLog (@"moveSpeed: %f", moveSpeed);
 }
+
 - (IBAction)dayToggle:(UISwitch *)sender {
     if ([sender isOn]) {
         ambientComponent = GLKVector4Make(0.5, 0.5, 0.5, 1.0);
@@ -182,6 +197,7 @@ CGPoint oldRotation;
         diffuseComponent = GLKVector4Make(0.1, 0.1, 0.5, 1.0);
     }
 }
+
 - (IBAction)fogToggle:(UISwitch *)sender {
     if ([sender isOn]) {
         fogIntensity = GLKVector4Make(.6f, .6f, .6f, 1.0);
@@ -189,6 +205,7 @@ CGPoint oldRotation;
         fogIntensity = GLKVector4Make(0, 0, 0, 0);
     }
 }
+
 - (IBAction)flashlightToggle:(UISwitch *)sender {
     if ([sender isOn]) {
         specularComponent = GLKVector4Make(1.0f, 1.0, 0.6, 1.0);
@@ -259,6 +276,7 @@ bool isDay = true;
 float enemyXPosition = 0.0f;
 float enemyYPosition = 0.0f;
 float enemyZPosition = 0.0f;
+float enemyYOffset = 0.0f;
 float enemyScale = 1.0f;
 float enemyRotation = 0.0f;
 bool enemyMove = true;
@@ -515,14 +533,12 @@ bool isTouchingEnemy = false;
 
 - (IBAction)pinching:(UIPinchGestureRecognizer *)sender {
     
-    NSLog(@"Scale: %f", sender.scale);
-    NSLog(@"Velocity: %f", sender.velocity);
+//    NSLog(@"Scale: %f", sender.scale);
+//    NSLog(@"Velocity: %f", sender.velocity);
     
     if (isTouchingEnemy && !enemyMove) {
         enemyScale = sender.scale;
-//        enemyRotation = sender.velocity;
     }
-    
 }
 
 #pragma mark - GLKView and GLKViewController delegate methods
@@ -678,7 +694,6 @@ float zMovement = -10.0f;
 float moveSpeed = 0;
 -(void)renderObject:(GameObject*)gameObject
 {
-    
     glBindVertexArrayOES(gameObject.modelHandle.vArray);
     glUseProgram(_program);
     
@@ -701,12 +716,12 @@ float moveSpeed = 0;
     //move and rotate the enemy
     if ([gameObject.name isEqualToString:@"enemy"]){
         
-        modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, enemyXPosition, enemyYPosition, enemyZPosition);
+        modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, enemyXPosition, enemyYPosition + enemyYOffset, enemyZPosition);
         if (enemyMove) {
             enemyXPosition += self.timeSinceLastUpdate * gameObject.speed;
         }
+        
         gameObject.rotation = GLKVector3Make( 0, enemyRotation, 0);
-//        enemyXPosition += self.timeSinceLastUpdate * enemyMoveSpeed;
         gameObject.position = GLKVector3Make(enemyXPosition, enemyYPosition, enemyZPosition);
         gameObject.scale = GLKVector3Make(.3f * enemyScale,.3f * enemyScale,.3f * enemyScale);
         
