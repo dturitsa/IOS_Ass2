@@ -104,21 +104,26 @@ GLint uniforms[NUM_UNIFORMS];
     view.context = self.context;
     view.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     
-    //detectdrag
+    //detect drag
     UIPanGestureRecognizer *panRecognizer;
     panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(dragging:)];
     [self.view addGestureRecognizer:panRecognizer];
     
-    //detec double tap  finger
+    //detect tap finger
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
     tapGesture.numberOfTapsRequired = 2;
     [self.view addGestureRecognizer:tapGesture];
     
-    //detec double tap  finger
+    //detect double tap finger
     UITapGestureRecognizer *tapGesture2 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(minimapToggle:)];
     tapGesture2.numberOfTapsRequired = 2;
     tapGesture2.numberOfTouchesRequired = 2;
     [self.view addGestureRecognizer:tapGesture2];
+    
+    //detect pinch
+    UIPinchGestureRecognizer *pinchRecognizer;
+    pinchRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(pinching:)];
+    [self.view addGestureRecognizer:pinchRecognizer];
     
     //initialize night and day shader parameters
     ambientDay = GLKVector4Make(0.5, 0.5, 0.5, 1.0);
@@ -139,12 +144,11 @@ GLint uniforms[NUM_UNIFORMS];
     }
 }
 
-
-
 CGPoint originalLocation;
 float xMovement, zMovement;
 float xRotation;
 CGPoint oldRotation;
+
 //drag-rotate detection
 -(void)dragging:(UIPanGestureRecognizer *)gesture
 {
@@ -219,6 +223,7 @@ bool isDay = true;
         // NSLog(@"touched color: %u, %u, %u", data[0], data[1], data[2]);
         if(data[0] > 100 && data[1] > 100 && data[2] > 100){
             NSLog(@"HEY! don't touch me!");
+            enemyMove = !enemyMove;
         }
     }
 }
@@ -254,8 +259,10 @@ bool isDay = true;
 float enemyXPosition = 0.0f;
 float enemyYPosition = 0.0f;
 float enemyZPosition = 0.0f;
-float enemyMoveSpeed = -0.1f;
+float enemyScale = 1.0f;
+float enemyRotation = 0.0f;
 bool enemyMove = true;
+bool isTouchingEnemy = false;
 
 - (void)setupGame
 {
@@ -272,14 +279,14 @@ bool enemyMove = true;
     
     _player = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:_player];
-    _player.position = GLKVector3Make(0.0f, 0.0f, 0.0f);
+    _player.position = GLKVector3Make(0.0f, 0.0f, -10.0f);
     _player.scale = GLKVector3Make(1.2f,1.2f,1.2f);
     _player.rotation = GLKVector3Make(0.0f,-1.5708f,0.0f);
     _player.modelName = @"triangle";
     _player.name = @"player";
     _player.textureName = @"playerIconBackground.jpg";
-    _player.length = 0.0f;
-    _player.width = 0.0f;
+    _player.length = 2.5f;
+    _player.width = 2.5f;
     
     //setup floor
     GameObject *floor = [[GameObject alloc] init];
@@ -300,8 +307,9 @@ bool enemyMove = true;
     enemy.modelName = @"player";
     enemy.name = @"enemy";
     enemy.textureName = @"Player_White.png";
-    enemy.length = 1.0f;
-    enemy.width = 1.0f;
+    enemy.length = 1.75f;
+    enemy.width = 1.75f;
+    enemy.speed = 0.1f;
     
     //setup maze walls
     GameObject *wall = [[GameObject alloc] init];
@@ -320,9 +328,9 @@ bool enemyMove = true;
     wall1.scale = GLKVector3Make(1,1,4);
     wall1.modelName = @"crateCube";
     wall1.textureName = @"brownBrickTexture2.jpg";
-//    wall1.length = 2.0f;
-//    wall1.width = 2.0f;
-//    wall1.name = @"wall1";
+    wall1.length = 2.0f * 1;
+    wall1.width = 2.0f * 4;
+    wall1.name = @"wall1";
     
     GameObject *wall2 = [[GameObject alloc] init];
     [_gameObjectsToAdd addObject:wall2];
@@ -493,6 +501,7 @@ bool enemyMove = true;
     
     if (one.length == 0 || one.width == 0 || two.length == 0 || two.width == 0)
         return false;
+    
     // check x-axis collision
     bool collisionX = one.position.x + one.length/2 >= two.position.x - two.length/2 && two.position.x + two.length/2 >= one.position.x - one.length/2;
     
@@ -501,6 +510,18 @@ bool enemyMove = true;
     
     // collision occurs only if on both axes
     return collisionX && collisionY;
+    
+}
+
+- (IBAction)pinching:(UIPinchGestureRecognizer *)sender {
+    
+    NSLog(@"Scale: %f", sender.scale);
+    NSLog(@"Velocity: %f", sender.velocity);
+    
+    if (isTouchingEnemy && !enemyMove) {
+        enemyScale = sender.scale;
+//        enemyRotation = sender.velocity;
+    }
     
 }
 
@@ -519,20 +540,26 @@ bool enemyMove = true;
     //loop through all gameobjects in scene
     //check if any of those two objects are colliding AND they are both solid
     //if they are, then return collision!
-    
+    isTouchingEnemy = false;
     for (int i=0; i <_gameObjects.count ; i++)
     {
         for (int j=0; j < _gameObjects.count ; j++)
         {
             if (_gameObjects[i] != _gameObjects[j] && [self checkCollisionBetweenObject:_gameObjects[i] and:_gameObjects[j]])
             {
-                NSLog(@"Collision Detected Between: %@ and %@", ((GameObject *)_gameObjects[i]).name,((GameObject *)_gameObjects[j]).name);
+                //detect collision when player touches enemy
+                if ([((GameObject *)_gameObjects[i]).name isEqualToString:@"player"] && [((GameObject *)_gameObjects[j]).name isEqualToString:@"enemy"]) {
+//                    NSLog(@"Collision Detected Between: %@ and %@", ((GameObject *)_gameObjects[i]).name,((GameObject *)_gameObjects[j]).name);
+                    isTouchingEnemy = true;
+                }
+//                NSLog(@"isTouchingEnemy: %d", isTouchingEnemy);
+//                NSLog(@"%@: (%f, %f)", ((GameObject *)_gameObjects[i]).name, ((GameObject *)_gameObjects[i]).position.x, ((GameObject *)_gameObjects[i]).position.z);
+                
                 //call oncollide function for first object only
                 [(GameObject *)_gameObjects[i] onCollision:_gameObjects[j]];
             }
         }
     }
-    
 }
 
 bool displayMinimap = false;
@@ -581,7 +608,7 @@ bool displayMinimap = false;
     GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(7.0f), aspect, 0.1f, 300.0f);
     GLKMatrix4 baseModelViewMatrix = GLKMatrix4MakeTranslation(-4.0f, 4.0f, 0.0f);
     
-    if ([gameObject.modelName isEqualToString:@"player"])
+    if ([gameObject.name isEqualToString:@"player"])
     {
         //player movement
         zMovement += moveSpeed * cosf(xRotation);
@@ -621,7 +648,6 @@ bool displayMinimap = false;
     
     _normalMatrix = GLKMatrix3InvertAndTranspose(GLKMatrix4GetMatrix3(modelViewMatrix), NULL);
     _modelViewProjectionMatrix = GLKMatrix4Multiply(projectionMatrix, modelViewMatrix);
-    
     
     // Set up uniforms
     glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEWPROJECTION_MATRIX], 1, 0, _modelViewProjectionMatrix.m);
@@ -673,11 +699,16 @@ float moveSpeed = 0;
     GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(gameObject.position.x, gameObject.position.y, gameObject.position.z);
     
     //move and rotate the enemy
-    if ([gameObject.name isEqualToString:@"enemy"] && enemyMove){
+    if ([gameObject.name isEqualToString:@"enemy"]){
         
         modelViewMatrix = GLKMatrix4Translate(modelViewMatrix, enemyXPosition, enemyYPosition, enemyZPosition);
-        enemyXPosition += self.timeSinceLastUpdate * enemyMoveSpeed;
+        if (enemyMove) {
+            enemyXPosition += self.timeSinceLastUpdate * gameObject.speed;
+        }
+        gameObject.rotation = GLKVector3Make( 0, enemyRotation, 0);
+//        enemyXPosition += self.timeSinceLastUpdate * enemyMoveSpeed;
         gameObject.position = GLKVector3Make(enemyXPosition, enemyYPosition, enemyZPosition);
+        gameObject.scale = GLKVector3Make(.3f * enemyScale,.3f * enemyScale,.3f * enemyScale);
         
 //        NSLog(@"Enemy Position: %f, %f", gameObject.position.x, gameObject.position.z);
         
@@ -686,8 +717,20 @@ float moveSpeed = 0;
     }
     
     //don't render the player (player model used for minimap only
-    if ([gameObject.name isEqualToString:@"player"]){
-        return;
+//    if ([gameObject.name isEqualToString:@"player"]){
+//        return;
+//    }
+    
+    if ([gameObject.name isEqualToString:@"player"])
+    {
+        gameObject.position = GLKVector3Make(xMovement, 0, zMovement);
+//        NSLog(@"Player Position: (%f, %f)", gameObject.position.x, gameObject.position.z);
+        
+        //player movement
+//        zMovement += moveSpeed * cosf(xRotation);
+//        xMovement += moveSpeed * -sinf(xRotation);
+//        GLKMatrix4 baseModelViewMatrix2 = GLKMatrix4MakeTranslation(-xMovement, zMovement, 0);
+//        baseModelViewMatrix = GLKMatrix4Multiply(baseModelViewMatrix, baseModelViewMatrix2);
     }
 
     //model rotation

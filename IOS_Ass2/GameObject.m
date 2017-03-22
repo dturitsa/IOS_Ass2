@@ -23,7 +23,9 @@
 
 -(void)onCollision:(GameObject*)otherObject
 {
-    //    NSLog(@"Something Hit an Object!");
+//    NSLog(@"Something Hit an Object!");
+    if (![otherObject.name isEqualToString:@"player"])
+        self.speed = -self.speed;
 }
 
 @end

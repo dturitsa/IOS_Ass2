@@ -36,6 +36,7 @@ typedef struct
 //collision detection
 @property float length;
 @property float width;
+@property float speed;
 
 -(bool)checkCollisionBetweenObject:(GameObject *)one and:(GameObject *)two; //MICHAEL'S Collision function declaration
 -(void)onCollision:(GameObject*)otherObject;
